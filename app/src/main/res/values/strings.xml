@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">LunchScanner</string>
+    <string name="action_settings">Einstellungen</string>
+    <string name="title_activity_settings">Einstellungen</string>
+
+    <string name="pref_title_rescan">Neuscannen intervall</string>
+    <string-array name="pref_rescan_titles">
+        <item>1 Sekunde</item>
+        <item>2 Sekunden</item>
+        <item>3 Sekunden</item>
+        <item>4 Sekunden</item>
+        <item>5 Sekunden</item>
+    </string-array>
+    <string-array name="pref_rescan_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+
+    <string name="clazz">Klasse</string>
+    <string name="copy_alert">CSV-Datei wird kopiert…</string>
+    <string name="copy_title">Kopiere</string>
+    <string name="fail_title">Fehler</string>
+    <string name="copy_fail">Keine CSV-Datei gefunden</string>
+    <string name="csv_file_copy">CSV-Datei kopieren</string>
+    <string name="csv_encoding_fail">CSV: Kodierungsfehler</string>
+    <string name="csv_read_fail">CSV: Konnte nicht gefunden werden</string>
+    <string name="gotLunch_1">. mal</string>
+    <string name="gotLunch_2">"Kommt zum "</string>
+    <string name="delete_data">Daten löschen</string>
+    <string name="lunch_display">Essensanzeige</string>
+    <string name="start_text">Um die benötigte CSV-Datei zu importieren, müssen die Optionen mittels der drei obenliegenden Punkte geöffnet werden. Nun erscheint die Auswahltmöglichkeit \'CSV-Datei kopieren\'. Durch ein betätigen dieser Taste wird das kopieren eingeleitet, wenn das kopieren erfolgreich war kommt eine dementsprechende Meldung, falls das Kopieren nicht funktioniert kommt eine Fehlermeldung. Wenn die CSV-Datei importiert wurde, ist der Scanner bereit. Dazu einfach auf das Icon mit der Kamera drücken und schon öffnet sich der Scanner, nun kann eine Essenskarte gescannt werden. Um den Intervall der Scanns einzustellen kann man wieder über die drei Punkte die Einstellungen öffnen. Wenn der Tag vorbei ist kann man die Daten wieder über die drei Punkte löschen. Die alten Daten werden ebenfalls bei neueinlesen gelöscht.</string>
+    <string name="start_title">Scannerbenutzung</string>
+    <string name="success_title">Erfolg</string>
+    <string name="copy_success">CSV-Dateien erfolgreich kopiert!</string>
+</resources>
