@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         IntentIntegrator integrator = new IntentIntegrator(instance);
         ArrayList<String> qr_code = new ArrayList<>();
         qr_code.add("QR_CODE");
+        integrator.addExtra("RESULT_DISPLAY_DURATION_MS", 50L);
         integrator.initiateScan(qr_code);
     }
 
