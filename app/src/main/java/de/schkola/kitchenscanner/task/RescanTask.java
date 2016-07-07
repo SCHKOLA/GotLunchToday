@@ -6,6 +6,9 @@ import android.preference.PreferenceManager;
 import de.schkola.kitchenscanner.activity.DisplayActivity;
 import de.schkola.kitchenscanner.activity.MainActivity;
 
+/**
+ * Dieser Task wird ausgeführt, wenn das Essen angezeigt wird und in ... Sekunden neugescannt wird.
+ */
 public class RescanTask extends AsyncTask<Void, Void, Void> {
 
     @Override

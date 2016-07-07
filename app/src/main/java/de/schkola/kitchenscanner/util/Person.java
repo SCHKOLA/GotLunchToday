@@ -11,6 +11,9 @@ import java.util.Map;
 
 import de.schkola.kitchenscanner.activity.MainActivity;
 
+/**
+ * Diese Klasse repräsentiert eine Person in der deren Daten gespeichert sind.
+ */
 public class Person {
 
     private static HashMap<Integer, Person> all = new HashMap<>();
@@ -26,6 +29,17 @@ public class Person {
         this.lunch = lunch;
         all.put(xba, this);
         f = new File(MainActivity.getInstance().getDir("Lunch", MainActivity.MODE_PRIVATE), xba + ".txt");
+    }
+
+    public static Person getByXBA(int xba) {
+        for (Map.Entry<Integer, Person> e : all.entrySet()) {
+            if (e.getKey() == xba) return e.getValue();
+        }
+        return null;
+    }
+
+    public static void clearData() {
+        all.clear();
     }
 
     public File getLunchFile() {
@@ -88,16 +102,5 @@ public class Person {
             fos.close();
         } catch (IOException ignored) {
         }
-    }
-
-    public static Person getByXBA(int xba) {
-        for (Map.Entry<Integer, Person> e : all.entrySet()) {
-            if (e.getKey() == xba) return e.getValue();
-        }
-        return null;
-    }
-
-    public static void clearData() {
-        all.clear();
     }
 }

@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -20,44 +22,28 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
-import de.schkola.kitchenscanner.util.CSVFile;
-import de.schkola.kitchenscanner.util.Person;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.task.CSVCopy;
+import de.schkola.kitchenscanner.util.CSVFile_Allergie;
+import de.schkola.kitchenscanner.util.CSVFile_Teilnahme;
+import de.schkola.kitchenscanner.util.Person;
 
 public class MainActivity extends AppCompatActivity {
 
     private static MainActivity instance;
     private static File lunch;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        instance = this;
-        lunch = instance.getDir("Lunch", MainActivity.MODE_PRIVATE);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        loadDataIntoApp();
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startScan();
-            }
-        });
-    }
-
+    /**
+     * Lädt die Daten in den App Cache
+     */
     public static void loadDataIntoApp() {
         try {
-            CSVFile file = new CSVFile(new FileInputStream(new File(instance.getDir("CSV", MainActivity.MODE_PRIVATE), "teilnahme.csv")));
+            CSVFile_Teilnahme file = new CSVFile_Teilnahme(new FileInputStream(new File(instance.getDir("CSV", MainActivity.MODE_PRIVATE), "teilnahme.csv")));
             for (String[] line : file.read(true)) {
                 new Person(Integer.parseInt(line[3]), line[2], line[4], Integer.parseInt(line[6]));
             }
-            CSVFile allergie = new CSVFile(new FileInputStream(new File(instance.getDir("CSV", MainActivity.MODE_PRIVATE), "allergie.csv")));
-            for (String[] line : allergie.read(false)) {
+            CSVFile_Allergie allergie = new CSVFile_Allergie(new FileInputStream(new File(instance.getDir("CSV", MainActivity.MODE_PRIVATE), "allergie.csv")));
+            for (String[] line : allergie.read()) {
                 Person person = Person.getByXBA(Integer.parseInt(line[0]));
                 if (person != null) {
                     person.addAllergie(line[1]);
@@ -78,18 +64,45 @@ public class MainActivity extends AppCompatActivity {
         }
         if (!lunch.exists()) {
             lunch.mkdir();
-        } else {
-            for (File f : lunch.listFiles()) {
-                f.delete();
-            }
         }
     }
 
+    /**
+     * Startet den Barcodescanner
+     */
     public static void startScan() {
         IntentIntegrator integrator = new IntentIntegrator(instance);
         ArrayList<String> qr_code = new ArrayList<>();
         qr_code.add("QR_CODE");
         integrator.initiateScan(qr_code);
+    }
+
+    public static MainActivity getInstance() {
+        return instance;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        instance = this;
+        lunch = instance.getDir("Lunch", MainActivity.MODE_PRIVATE);
+        //Setzte Activity Vollbild
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //Setzte Content
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        loadDataIntoApp();
+        //Setzte Action des Buttons
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startScan();
+            }
+        });
     }
 
     @Override
@@ -128,13 +141,16 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
+                //Startet die Einstellungen
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
             case R.id.action_CSV_copy:
+                //Startet das kopieren der CSV-Dateien
                 new CSVCopy().execute();
                 return true;
             case R.id.action_delete_data:
+                //Löscht den Cache
                 Person.clearData();
                 for (File f : lunch.listFiles()) {
                     f.delete();
@@ -143,9 +159,5 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    public static MainActivity getInstance() {
-        return instance;
     }
 }

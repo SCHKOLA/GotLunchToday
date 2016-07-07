@@ -9,9 +9,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import de.schkola.kitchenscanner.activity.MainActivity;
 import de.schkola.kitchenscanner.R;
+import de.schkola.kitchenscanner.activity.MainActivity;
 
+/**
+ * Diese Klassen sorgt für das Asyncrone Kopieren der CSV Dateien
+ */
 public class CSVCopy extends AsyncTask<Void, Void, Boolean> {
 
     private ProgressDialog dialog;

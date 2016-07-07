@@ -8,24 +8,24 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CSVFile {
+/**
+ * Für CSV Datei nach Schema
+ * [XBA-Nummer],[Allergie]
+ */
+public class CSVFile_Allergie {
     InputStream inputStream;
 
-    public CSVFile(InputStream inputStream) {
+    public CSVFile_Allergie(InputStream inputStream) {
         this.inputStream = inputStream;
     }
 
-    public List<String[]> read(boolean b) throws UnsupportedEncodingException {
+    public List<String[]> read() throws UnsupportedEncodingException {
         List<String[]> resultList = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1252"));
         try {
             String csvLine;
             while ((csvLine = reader.readLine()) != null) {
-                String[] split1 = csvLine.split("\"");
                 String[] row = csvLine.split(",");
-                if (b) {
-                    row[4] = split1[1];
-                }
                 resultList.add(row);
             }
         } catch (IOException ex) {
