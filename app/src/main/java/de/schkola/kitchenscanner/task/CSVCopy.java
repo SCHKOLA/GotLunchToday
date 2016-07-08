@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.activity.MainActivity;
+import de.schkola.kitchenscanner.activity.SettingsActivity;
 
 /**
  * Diese Klassen sorgt für das Asyncrone Kopieren der CSV Dateien
@@ -21,7 +22,7 @@ public class CSVCopy extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected void onPreExecute() {
-        dialog = new ProgressDialog(MainActivity.getInstance());
+        dialog = new ProgressDialog(SettingsActivity.getInstance());
         dialog.setCancelable(false);
         dialog.setTitle(MainActivity.getInstance().getString(R.string.copy_title));
         dialog.setMessage(MainActivity.getInstance().getString(R.string.copy_alert));
@@ -38,7 +39,7 @@ public class CSVCopy extends AsyncTask<Void, Void, Boolean> {
                 File[] files = usb.listFiles();
                 for (File f : files) {
                     if (f.getName().endsWith(".csv") && !f.getName().equals("allergie.csv")) {
-                        File csv = MainActivity.getInstance().getDir("CSV", MainActivity.MODE_PRIVATE);
+                        File csv = SettingsActivity.getInstance().getDir("CSV", SettingsActivity.MODE_PRIVATE);
                         if (!csv.exists()) {
                             csv.mkdir();
                         }
@@ -56,7 +57,7 @@ public class CSVCopy extends AsyncTask<Void, Void, Boolean> {
                         out.close();
                         re = true;
                     } else if (f.getName().equals("allergie.csv")) {
-                        File csv = MainActivity.getInstance().getDir("CSV", MainActivity.MODE_PRIVATE);
+                        File csv = SettingsActivity.getInstance().getDir("CSV", SettingsActivity.MODE_PRIVATE);
                         if (!csv.exists()) {
                             csv.mkdir();
                         }
@@ -85,14 +86,14 @@ public class CSVCopy extends AsyncTask<Void, Void, Boolean> {
         dialog.dismiss();
         dialog.cancel();
         if (!b) {
-            new AlertDialog.Builder(MainActivity.getInstance())
+            new AlertDialog.Builder(SettingsActivity.getInstance())
                     .setTitle(R.string.fail_title)
                     .setMessage(R.string.copy_fail)
                     .setPositiveButton(android.R.string.ok, null)
                     .create().show();
         } else {
             MainActivity.loadDataIntoApp();
-            new AlertDialog.Builder(MainActivity.getInstance())
+            new AlertDialog.Builder(SettingsActivity.getInstance())
                     .setTitle(R.string.success_title)
                     .setMessage(R.string.copy_success)
                     .setPositiveButton(android.R.string.ok, null)

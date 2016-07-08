@@ -21,7 +21,7 @@
 
     <string name="clazz">Klasse</string>
     <string name="copy_alert">CSV-Datei wird kopiert…</string>
-    <string name="copy_title">Kopiere</string>
+    <string name="copy_title">Kopieren</string>
     <string name="fail_title">Fehler</string>
     <string name="copy_fail">Keine CSV-Datei gefunden</string>
     <string name="csv_file_copy">CSV-Datei kopieren</string>
@@ -35,4 +35,7 @@
     <string name="start_title">Scannerbenutzung</string>
     <string name="success_title">Erfolg</string>
     <string name="copy_success">CSV-Dateien erfolgreich kopiert!</string>
+    <string name="copy_request">Die eingelesenen Daten werden ersetzt!\nMöchten sie wirklich kopieren?</string>
+    <string name="delete_title">Löschen</string>
+    <string name="delete_request">Alle Essensdaten werden entfernt!\nMöchten sie wirklich löschen?</string>
 </resources>

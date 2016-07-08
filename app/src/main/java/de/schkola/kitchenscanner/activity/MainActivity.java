@@ -23,7 +23,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import de.schkola.kitchenscanner.R;
-import de.schkola.kitchenscanner.task.CSVCopy;
 import de.schkola.kitchenscanner.util.CSVFile_Allergie;
 import de.schkola.kitchenscanner.util.CSVFile_Teilnahme;
 import de.schkola.kitchenscanner.util.Person;
@@ -80,6 +79,10 @@ public class MainActivity extends AppCompatActivity {
 
     public static MainActivity getInstance() {
         return instance;
+    }
+
+    public static File getLunchDir() {
+        return lunch;
     }
 
     @Override
@@ -143,19 +146,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_settings:
                 //Startet die Einstellungen
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
-                return true;
-            case R.id.action_CSV_copy:
-                //Startet das kopieren der CSV-Dateien
-                new CSVCopy().execute();
-                return true;
-            case R.id.action_delete_data:
-                //Löscht den Cache
-                Person.clearData();
-                for (File f : lunch.listFiles()) {
-                    f.delete();
-                }
+                startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
