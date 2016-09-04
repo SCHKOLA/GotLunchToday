@@ -34,7 +34,7 @@ public class CSVCopy extends AsyncTask<Void, Void, Boolean> {
         boolean re = false;
         try {
             //Mountpoint -> Bei der verwendung eines anderen Gerätes ändern
-            File usb = new File("/mnt/usb");
+            File usb = new File("/storage/usbdisk");
             if (usb.exists()) {
                 File[] files = usb.listFiles();
                 for (File f : files) {

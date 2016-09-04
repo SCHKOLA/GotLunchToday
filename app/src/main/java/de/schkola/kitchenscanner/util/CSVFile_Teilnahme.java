@@ -25,10 +25,7 @@ public class CSVFile_Teilnahme {
         try {
             String csvLine;
             while ((csvLine = reader.readLine()) != null) {
-                String[] split1 = csvLine.split("\"");
-                String[] row = csvLine.split(",");
-                row[4] = split1[1];
-                resultList.add(row);
+                resultList.add(csvLine.split(";"));
             }
         } catch (IOException ex) {
             throw new RuntimeException("Error in reading CSV file: " + ex);

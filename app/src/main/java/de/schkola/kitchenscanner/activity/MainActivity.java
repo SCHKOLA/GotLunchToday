@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             CSVFile_Teilnahme file = new CSVFile_Teilnahme(new FileInputStream(new File(instance.getDir("CSV", MainActivity.MODE_PRIVATE), "teilnahme.csv")));
             for (String[] line : file.read(true)) {
-                new Person(Integer.parseInt(line[3]), line[2], line[4], Integer.parseInt(line[6]));
+                new Person(Integer.parseInt(line[3]), line[2], line[4], Integer.parseInt(line[5]));
             }
             CSVFile_Allergie allergie = new CSVFile_Allergie(new FileInputStream(new File(instance.getDir("CSV", MainActivity.MODE_PRIVATE), "allergie.csv")));
             for (String[] line : allergie.read()) {
