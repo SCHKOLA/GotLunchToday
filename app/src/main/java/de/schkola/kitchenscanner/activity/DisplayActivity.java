@@ -71,9 +71,4 @@ public class DisplayActivity extends AppCompatActivity {
         rct = new RescanTask();
         rct.execute();
     }
-
-    @Override
-    public void finish() {
-        super.finish();
-    }
 }
