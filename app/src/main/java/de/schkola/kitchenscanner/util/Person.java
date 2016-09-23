@@ -1,13 +1,13 @@
 package de.schkola.kitchenscanner.util;
 
+import android.util.SparseArray;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
 
 import de.schkola.kitchenscanner.activity.MainActivity;
 
@@ -16,7 +16,7 @@ import de.schkola.kitchenscanner.activity.MainActivity;
  */
 public class Person {
 
-    private static HashMap<Integer, Person> all = new HashMap<>();
+    private static SparseArray<Person> all = new SparseArray<>();
     private final String person_name;
     private final String clazz;
     private final int lunch;
@@ -32,17 +32,10 @@ public class Person {
     }
 
     public static Person getByXBA(int xba) {
-        for (Map.Entry<Integer, Person> e : all.entrySet()) {
-            if (e.getKey() == xba) return e.getValue();
-        }
-        return null;
+        return all.get(xba);
     }
 
-    public static void clearData() {
-        all.clear();
-    }
-
-    public File getLunchFile() {
+    private File getLunchFile() {
         return f;
     }
 

@@ -13,7 +13,7 @@ import java.util.List;
  * [XBA-Nummer],[Allergie]
  */
 public class CSVFile_Allergie {
-    InputStream inputStream;
+    private InputStream inputStream;
 
     public CSVFile_Allergie(InputStream inputStream) {
         this.inputStream = inputStream;

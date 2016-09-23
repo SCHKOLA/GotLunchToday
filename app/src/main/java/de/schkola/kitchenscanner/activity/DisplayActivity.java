@@ -1,6 +1,7 @@
 package de.schkola.kitchenscanner.activity;
 
 import android.content.Intent;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
@@ -8,15 +9,31 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import de.schkola.kitchenscanner.R;
+import de.schkola.kitchenscanner.task.FlashLightTask;
 import de.schkola.kitchenscanner.task.RescanTask;
 
 public class DisplayActivity extends AppCompatActivity {
 
     private static RescanTask rct;
     private static DisplayActivity instance;
+    private static Camera camera;
+    private static Camera.Parameters p;
 
     public static DisplayActivity getInstance() {
         return instance;
+    }
+
+    public static void setFlashLight(boolean b) {
+        if (b) {
+            // Turn on
+            p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+            camera.setParameters(p);
+        } else {
+            // Turn off
+            p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+            camera.setParameters(p);
+            camera.release();
+        }
     }
 
     @Override
@@ -27,6 +44,8 @@ public class DisplayActivity extends AppCompatActivity {
         }
         instance = this;
         super.onCreate(savedInstanceState);
+        camera = Camera.open();
+        p = camera.getParameters();
         //Setzte die Activity Vollbild
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -46,8 +65,15 @@ public class DisplayActivity extends AppCompatActivity {
         }
         TextView tv_allergie = (TextView) findViewById(R.id.allergie);
         tv_allergie.setText(intent.getStringExtra("allergie"));
+        //Starte FlashLightTask
+        new FlashLightTask().execute();
         //Starte neuen Rescan task
         rct = new RescanTask();
         rct.execute();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
     }
 }

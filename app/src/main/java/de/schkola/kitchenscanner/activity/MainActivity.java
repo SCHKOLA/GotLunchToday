@@ -38,15 +38,8 @@ public class MainActivity extends AppCompatActivity {
     public static void loadDataIntoApp() {
         try {
             CSVFile_Teilnahme file = new CSVFile_Teilnahme(new FileInputStream(new File(instance.getDir("CSV", MainActivity.MODE_PRIVATE), "teilnahme.csv")));
-            for (String[] line : file.read(true)) {
+            for (String[] line : file.read()) {
                 new Person(Integer.parseInt(line[3]), line[2], line[4], Integer.parseInt(line[5]));
-            }
-            CSVFile_Allergie allergie = new CSVFile_Allergie(new FileInputStream(new File(instance.getDir("CSV", MainActivity.MODE_PRIVATE), "allergie.csv")));
-            for (String[] line : allergie.read()) {
-                Person person = Person.getByXBA(Integer.parseInt(line[0]));
-                if (person != null) {
-                    person.addAllergie(line[1]);
-                }
             }
         } catch (UnsupportedEncodingException e) {
             new AlertDialog.Builder(instance)
@@ -60,6 +53,16 @@ public class MainActivity extends AppCompatActivity {
                     .setMessage(R.string.csv_read_fail)
                     .setPositiveButton(android.R.string.ok, null)
                     .create().show();
+        }
+        try {
+            CSVFile_Allergie allergie = new CSVFile_Allergie(new FileInputStream(new File(instance.getDir("CSV", MainActivity.MODE_PRIVATE), "allergie.csv")));
+            for (String[] line : allergie.read()) {
+                Person person = Person.getByXBA(Integer.parseInt(line[0]));
+                if (person != null) {
+                    person.addAllergie(line[1]);
+                }
+            }
+        } catch (UnsupportedEncodingException | FileNotFoundException ignored) {
         }
         if (!lunch.exists()) {
             lunch.mkdir();

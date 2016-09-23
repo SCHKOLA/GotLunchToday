@@ -10,16 +10,16 @@ import java.util.List;
 
 /**
  * Für CSV Datei nach Schema
- * [Wochentag],[Datum],[Klassenstufe],[XBA-Nummer],"[Nachname],[Vorname]",[Essen]
+ * [Wochentag];[Datum];[Klassenstufe];[XBA-Nummer];[Nachname], [Vorname];[Essen]
  */
 public class CSVFile_Teilnahme {
-    InputStream inputStream;
+    private InputStream inputStream;
 
     public CSVFile_Teilnahme(InputStream inputStream) {
         this.inputStream = inputStream;
     }
 
-    public List<String[]> read(boolean b) throws UnsupportedEncodingException {
+    public List<String[]> read() throws UnsupportedEncodingException {
         List<String[]> resultList = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1252"));
         try {
