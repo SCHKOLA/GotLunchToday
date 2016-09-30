@@ -17,13 +17,20 @@ public class DisplayActivity extends AppCompatActivity {
     private static RescanTask rct;
     private static DisplayActivity instance;
     private static Camera camera;
-    private static Camera.Parameters p;
 
     public static DisplayActivity getInstance() {
         return instance;
     }
 
     public static void setFlashLight(boolean b) {
+        if (camera == null) {
+            try {
+                camera = Camera.open();
+            } catch (RuntimeException e) {
+                camera = Camera.open();
+            }
+        }
+        Camera.Parameters p = camera.getParameters();
         if (b) {
             // Turn on
             p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
@@ -33,6 +40,7 @@ public class DisplayActivity extends AppCompatActivity {
             p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
             camera.setParameters(p);
             camera.release();
+            camera = null;
         }
     }
 
@@ -44,8 +52,6 @@ public class DisplayActivity extends AppCompatActivity {
         }
         instance = this;
         super.onCreate(savedInstanceState);
-        camera = Camera.open();
-        p = camera.getParameters();
         //Setzte die Activity Vollbild
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);

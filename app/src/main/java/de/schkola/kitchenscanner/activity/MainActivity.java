@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
             for (String[] line : file.read()) {
                 new Person(Integer.parseInt(line[3]), line[2], line[4], Integer.parseInt(line[5]));
             }
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException | ArrayIndexOutOfBoundsException e) {
             new AlertDialog.Builder(instance)
                     .setTitle(R.string.fail_title)
                     .setMessage(R.string.csv_encoding_fail)
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                     person.addAllergie(line[1]);
                 }
             }
-        } catch (UnsupportedEncodingException | FileNotFoundException ignored) {
+        } catch (UnsupportedEncodingException | FileNotFoundException | ArrayIndexOutOfBoundsException ignored) {
         }
         if (!lunch.exists()) {
             lunch.mkdir();

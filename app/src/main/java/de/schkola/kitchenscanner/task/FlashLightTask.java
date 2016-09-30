@@ -11,13 +11,17 @@ public class FlashLightTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected void onPreExecute() {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ignored) {
+        }
         DisplayActivity.setFlashLight(true);
     }
 
     @Override
     protected Void doInBackground(Void... Void) {
         try {
-            Thread.sleep(500);
+            Thread.sleep(150);
         } catch (InterruptedException ignored) {
         }
         return null;
