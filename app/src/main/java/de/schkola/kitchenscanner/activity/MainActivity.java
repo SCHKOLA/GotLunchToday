@@ -24,6 +24,7 @@
 
 package de.schkola.kitchenscanner.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -59,11 +60,14 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Lädt die Daten in den App Cache
      */
-    public static void loadDataIntoApp() {
+    public static void loadDataIntoApp(Activity instance) {
         try {
             CSVFile_Teilnahme file = new CSVFile_Teilnahme(new FileInputStream(new File(instance.getDir("CSV", MainActivity.MODE_PRIVATE), "teilnahme.csv")));
             for (String[] line : file.read()) {
-                new Person(Integer.parseInt(line[3]), line[2], line[4], Integer.parseInt(line[5]));
+                try {
+                    new Person(Integer.parseInt(line[3].replace("\"", "")), line[2].replace("\"", ""), line[4].replace("\"", ""), Integer.parseInt(line[5].replace("\"", "")));
+                } catch (NumberFormatException ignored) {
+                }
             }
         } catch (UnsupportedEncodingException | ArrayIndexOutOfBoundsException e) {
             new AlertDialog.Builder(instance)
@@ -100,12 +104,9 @@ public class MainActivity extends AppCompatActivity {
         IntentIntegrator integrator = new IntentIntegrator(instance);
         ArrayList<String> qr_code = new ArrayList<>();
         qr_code.add("QR_CODE");
-        integrator.addExtra("RESULT_DISPLAY_DURATION_MS", 50L);
+        integrator.addExtra("RESULT_DISPLAY_DURATION_MS", 10L);
+        integrator.setBeepEnabled(true);
         integrator.initiateScan(qr_code);
-    }
-
-    public static MainActivity getInstance() {
-        return instance;
     }
 
     public static File getLunchDir() {
@@ -116,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         instance = this;
-        lunch = instance.getDir("Lunch", MainActivity.MODE_PRIVATE);
+        lunch = this.getDir("Lunch", MainActivity.MODE_PRIVATE);
         //Setzte Activity Vollbild
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -125,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        loadDataIntoApp();
+        loadDataIntoApp(this);
         //Setzte Action des Buttons
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

@@ -39,12 +39,7 @@ import de.schkola.kitchenscanner.task.RescanTask;
 public class DisplayActivity extends AppCompatActivity {
 
     private static RescanTask rct;
-    private static DisplayActivity instance;
     private static Camera camera;
-
-    public static DisplayActivity getInstance() {
-        return instance;
-    }
 
     public static void setFlashLight(boolean b) {
         if (camera == null) {
@@ -74,7 +69,6 @@ public class DisplayActivity extends AppCompatActivity {
         if (rct != null) {
             rct.cancel(true);
         }
-        instance = this;
         super.onCreate(savedInstanceState);
         //Setzte die Activity Vollbild
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -98,7 +92,7 @@ public class DisplayActivity extends AppCompatActivity {
         //Starte FlashLightTask
         new FlashLightTask().execute();
         //Starte neuen Rescan task
-        rct = new RescanTask();
+        rct = new RescanTask(this);
         rct.execute();
     }
 }

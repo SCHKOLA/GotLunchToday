@@ -42,11 +42,7 @@ import de.schkola.kitchenscanner.task.CSVCopy;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private static SettingsActivity instance;
-
-    public static SettingsActivity getInstance() {
-        return instance;
-    }
+    private SettingsActivity instance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +74,7 @@ public class SettingsActivity extends AppCompatActivity {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                new CSVCopy().execute();
+                                new CSVCopy(instance).execute();
                             }
                         })
                         .setNegativeButton(android.R.string.no, null)

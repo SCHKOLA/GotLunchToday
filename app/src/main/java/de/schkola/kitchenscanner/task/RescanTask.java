@@ -24,10 +24,10 @@
 
 package de.schkola.kitchenscanner.task;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
-import de.schkola.kitchenscanner.activity.DisplayActivity;
 import de.schkola.kitchenscanner.activity.MainActivity;
 
 /**
@@ -35,10 +35,16 @@ import de.schkola.kitchenscanner.activity.MainActivity;
  */
 public class RescanTask extends AsyncTask<Void, Void, Void> {
 
+    private Activity instance;
+
+    public RescanTask(Activity instance) {
+        this.instance = instance;
+    }
+
     @Override
     protected Void doInBackground(Void... Void) {
         try {
-            Thread.sleep(Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(MainActivity.getInstance()).getString("rescan", "2")) * 1000);
+            Thread.sleep(Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(instance).getString("rescan", "2")) * 1000);
         } catch (InterruptedException ignored) {
         }
         return null;
@@ -46,7 +52,7 @@ public class RescanTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void aVoid) {
-        DisplayActivity.getInstance().finish();
+        instance.finish();
         MainActivity.startScan();
     }
 }

@@ -24,6 +24,7 @@
 
 package de.schkola.kitchenscanner.task;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
@@ -35,7 +36,6 @@ import java.io.IOException;
 
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.activity.MainActivity;
-import de.schkola.kitchenscanner.activity.SettingsActivity;
 
 /**
  * Diese Klassen sorgt für das Asyncrone Kopieren der CSV Dateien
@@ -43,13 +43,18 @@ import de.schkola.kitchenscanner.activity.SettingsActivity;
 public class CSVCopy extends AsyncTask<Void, Void, Boolean> {
 
     private ProgressDialog dialog;
+    private Activity instance;
+
+    public CSVCopy(Activity instance) {
+        this.instance = instance;
+    }
 
     @Override
     protected void onPreExecute() {
-        dialog = new ProgressDialog(SettingsActivity.getInstance());
+        dialog = new ProgressDialog(instance);
         dialog.setCancelable(false);
-        dialog.setTitle(MainActivity.getInstance().getString(R.string.copy_title));
-        dialog.setMessage(MainActivity.getInstance().getString(R.string.copy_alert));
+        dialog.setTitle(instance.getString(R.string.copy_title));
+        dialog.setMessage(instance.getString(R.string.copy_alert));
         dialog.show();
     }
 
@@ -63,7 +68,7 @@ public class CSVCopy extends AsyncTask<Void, Void, Boolean> {
                 File[] files = usb.listFiles();
                 for (File f : files) {
                     if (f.getName().endsWith(".csv") && !f.getName().equals("allergie.csv")) {
-                        File csv = SettingsActivity.getInstance().getDir("CSV", SettingsActivity.MODE_PRIVATE);
+                        File csv = instance.getDir("CSV", Activity.MODE_PRIVATE);
                         if (!csv.exists()) {
                             csv.mkdir();
                         }
@@ -81,7 +86,7 @@ public class CSVCopy extends AsyncTask<Void, Void, Boolean> {
                         out.close();
                         re = true;
                     } else if (f.getName().equals("allergie.csv")) {
-                        File csv = SettingsActivity.getInstance().getDir("CSV", SettingsActivity.MODE_PRIVATE);
+                        File csv = instance.getDir("CSV", Activity.MODE_PRIVATE);
                         if (!csv.exists()) {
                             csv.mkdir();
                         }
@@ -110,14 +115,14 @@ public class CSVCopy extends AsyncTask<Void, Void, Boolean> {
         dialog.dismiss();
         dialog.cancel();
         if (!b) {
-            new AlertDialog.Builder(SettingsActivity.getInstance())
+            new AlertDialog.Builder(instance)
                     .setTitle(R.string.fail_title)
                     .setMessage(R.string.copy_fail)
                     .setPositiveButton(android.R.string.ok, null)
                     .create().show();
         } else {
-            MainActivity.loadDataIntoApp();
-            new AlertDialog.Builder(SettingsActivity.getInstance())
+            MainActivity.loadDataIntoApp(instance);
+            new AlertDialog.Builder(instance)
                     .setTitle(R.string.success_title)
                     .setMessage(R.string.copy_success)
                     .setPositiveButton(android.R.string.ok, null)

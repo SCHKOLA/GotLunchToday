@@ -52,7 +52,7 @@ public class Person {
         this.person_name = name;
         this.lunch = lunch;
         all.put(xba, this);
-        f = new File(MainActivity.getInstance().getDir("Lunch", MainActivity.MODE_PRIVATE), xba + ".txt");
+        f = new File(MainActivity.getLunchDir(), xba + ".txt");
     }
 
     public static Person getByXBA(int xba) {
