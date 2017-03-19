@@ -62,7 +62,7 @@ public class CSVCopy extends AsyncTask<Void, Void, Boolean> {
     protected Boolean doInBackground(Void... voids) {
         boolean re = false;
         try {
-            //Mountpoint -> Bei der verwendung eines anderen Gerätes ändern
+            //MountPoint -> If you want to use an other Device CHANGE THIS!
             File usb = new File("/storage/usbdisk");
             if (usb.exists()) {
                 File[] files = usb.listFiles();

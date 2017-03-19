@@ -45,7 +45,7 @@ public class Person {
     private final String clazz;
     private final int lunch;
     private final File f;
-    private String allergie = "";
+    private String allergies = "";
 
     public Person(int xba, String clazz, String name, int lunch) {
         this.clazz = clazz;
@@ -95,15 +95,15 @@ public class Person {
         }
     }
 
-    public String getAllergie() {
-        return allergie;
+    public String getAllergies() {
+        return allergies;
     }
 
-    public void addAllergie(String s) {
-        if (allergie.equals("")) {
-            allergie = s;
+    public void addAllergy(String s) {
+        if (allergies.equals("")) {
+            allergies = s;
         } else {
-            allergie += ", " + s;
+            allergies += ", " + s;
         }
     }
 

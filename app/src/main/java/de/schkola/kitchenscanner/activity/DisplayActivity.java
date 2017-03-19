@@ -65,33 +65,33 @@ public class DisplayActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //Beende den letzten Rescantask (Bug-Fix)
+        //Stop last RescanTask (Bug-Fix)
         if (rct != null) {
             rct.cancel(true);
         }
         super.onCreate(savedInstanceState);
-        //Setzte die Activity Vollbild
+        //Set die Activity Fullscreen
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        //Setzte Content
+        //Set Content
         setContentView(R.layout.activity_display);
         Intent intent = getIntent();
-        //Bearbeite Content
+        //Edit Content
         TextView tv_name = (TextView) findViewById(R.id.name);
         tv_name.setText(intent.getStringExtra("name"));
         TextView tv_clazz = (TextView) findViewById(R.id.clazz);
         tv_clazz.setText(intent.getStringExtra("class"));
         TextView tv_lunch = (TextView) findViewById(R.id.lunch);
         tv_lunch.setText(intent.getStringExtra("lunch"));
-        TextView tv_gotĹunch = (TextView) findViewById(R.id.gotToday);
-        if (intent.getIntExtra("gotĹunch", 0) > 1) {
-            tv_gotĹunch.setText(String.format("%s%s%s", getString(R.string.gotLunch_2), String.valueOf(intent.getIntExtra("gotĹunch", 0)), getString(R.string.gotLunch_1)));
+        TextView tv_gotLunch = (TextView) findViewById(R.id.gotToday);
+        if (intent.getIntExtra("gotLunch", 0) > 1) {
+            tv_gotLunch.setText(String.format("%s%s%s", getString(R.string.gotLunch_2), String.valueOf(intent.getIntExtra("gotLunch", 0)), getString(R.string.gotLunch_1)));
         }
-        TextView tv_allergie = (TextView) findViewById(R.id.allergie);
-        tv_allergie.setText(intent.getStringExtra("allergie"));
-        //Starte FlashLightTask
+        TextView tv_allergies = (TextView) findViewById(R.id.allergie);
+        tv_allergies.setText(intent.getStringExtra("allergies"));
+        //Start FlashLightTask
         new FlashLightTask().execute();
-        //Starte neuen Rescan task
+        //Start new Rescan task
         rct = new RescanTask(this);
         rct.execute();
     }

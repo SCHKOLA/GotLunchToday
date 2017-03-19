@@ -31,10 +31,8 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -87,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
             for (String[] line : allergie.read()) {
                 Person person = Person.getByXBA(Integer.parseInt(line[0]));
                 if (person != null) {
-                    person.addAllergie(line[1]);
+                    person.addAllergy(line[1]);
                 }
             }
         } catch (UnsupportedEncodingException | FileNotFoundException | ArrayIndexOutOfBoundsException ignored) {
@@ -118,23 +116,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         instance = this;
         lunch = this.getDir("Lunch", MainActivity.MODE_PRIVATE);
-        //Setzte Activity Vollbild
+        //Set Activity Fullscreen
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        //Setzte Content
+        //Set Content
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         loadDataIntoApp(this);
-        //Setzte Action des Buttons
+        //Set Action Buttons
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startScan();
-            }
-        });
+        fab.setOnClickListener(view -> startScan());
     }
 
     @Override
@@ -142,15 +135,14 @@ public class MainActivity extends AppCompatActivity {
         try {
             IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
             if (scanResult != null && scanResult.getContents() != null) {
-                Log.d("BarCodeScan XBA-Nummer", scanResult.getContents());
                 Person person = Person.getByXBA(Integer.parseInt(scanResult.getContents()));
                 Intent intent = new Intent(this, DisplayActivity.class);
                 if (person != null) {
                     intent.putExtra("name", person.getPersonName());
                     intent.putExtra("class", person.getClazz());
                     intent.putExtra("lunch", person.getLunch());
-                    intent.putExtra("gotĹunch", person.getGotLunch() + 1);
-                    intent.putExtra("allergie", person.getAllergie());
+                    intent.putExtra("gotLunch", person.getGotLunch() + 1);
+                    intent.putExtra("allergies", person.getAllergies());
                     person.gotLunch();
                 } else {
                     intent.putExtra("lunch", "X");
@@ -173,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                //Startet die Einstellungen
+                //Start Settings
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             default:

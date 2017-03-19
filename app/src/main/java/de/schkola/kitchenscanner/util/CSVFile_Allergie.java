@@ -49,8 +49,7 @@ public class CSVFile_Allergie {
         try {
             String csvLine;
             while ((csvLine = reader.readLine()) != null) {
-                String[] row = csvLine.split(",");
-                resultList.add(row);
+                resultList.add(csvLine.split(","));
             }
         } catch (IOException ex) {
             throw new RuntimeException("Error in reading CSV file: " + ex);
