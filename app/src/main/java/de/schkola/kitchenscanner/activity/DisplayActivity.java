@@ -24,8 +24,12 @@
 
 package de.schkola.kitchenscanner.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.Camera;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
@@ -33,7 +37,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import de.schkola.kitchenscanner.R;
-import de.schkola.kitchenscanner.task.FlashLightTask;
+import de.schkola.kitchenscanner.task.DoLaterTask;
 import de.schkola.kitchenscanner.task.RescanTask;
 
 public class DisplayActivity extends AppCompatActivity {
@@ -45,8 +49,9 @@ public class DisplayActivity extends AppCompatActivity {
         if (camera == null) {
             try {
                 camera = Camera.open();
+                camera.startPreview();
             } catch (RuntimeException e) {
-                camera = Camera.open();
+                e.printStackTrace();
             }
         }
         Camera.Parameters p = camera.getParameters();
@@ -70,6 +75,23 @@ public class DisplayActivity extends AppCompatActivity {
             rct.cancel(true);
         }
         super.onCreate(savedInstanceState);
+        //Start DoLaterTask
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            new DoLaterTask(250, () -> DisplayActivity.setFlashLight(true), () -> DisplayActivity.setFlashLight(false)).execute();
+        } else {
+            CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+            try {
+                manager.setTorchMode("0", true);
+                new DoLaterTask(250, () -> {
+                }, () -> {
+                    try {
+                        manager.setTorchMode("0", false);
+                    } catch (CameraAccessException ignored) {
+                    }
+                });
+            } catch (CameraAccessException ignored) {
+            }
+        }
         //Set die Activity Fullscreen
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -77,20 +99,14 @@ public class DisplayActivity extends AppCompatActivity {
         setContentView(R.layout.activity_display);
         Intent intent = getIntent();
         //Edit Content
-        TextView tv_name = (TextView) findViewById(R.id.name);
-        tv_name.setText(intent.getStringExtra("name"));
-        TextView tv_clazz = (TextView) findViewById(R.id.clazz);
-        tv_clazz.setText(intent.getStringExtra("class"));
-        TextView tv_lunch = (TextView) findViewById(R.id.lunch);
-        tv_lunch.setText(intent.getStringExtra("lunch"));
+        ((TextView) findViewById(R.id.name)).setText(intent.getStringExtra("name"));
+        ((TextView) findViewById(R.id.clazz)).setText(intent.getStringExtra("class"));
+        ((TextView) findViewById(R.id.lunch)).setText(intent.getStringExtra("lunch"));
         TextView tv_gotLunch = (TextView) findViewById(R.id.gotToday);
         if (intent.getIntExtra("gotLunch", 0) > 1) {
             tv_gotLunch.setText(String.format("%s%s%s", getString(R.string.gotLunch_2), String.valueOf(intent.getIntExtra("gotLunch", 0)), getString(R.string.gotLunch_1)));
         }
-        TextView tv_allergies = (TextView) findViewById(R.id.allergie);
-        tv_allergies.setText(intent.getStringExtra("allergies"));
-        //Start FlashLightTask
-        new FlashLightTask().execute();
+        ((TextView) findViewById(R.id.allergie)).setText(intent.getStringExtra("allergies"));
         //Start new Rescan task
         rct = new RescanTask(this);
         rct.execute();
