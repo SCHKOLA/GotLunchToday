@@ -34,10 +34,6 @@ public class SettingsFragment extends PreferenceFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupPreferences();
-    }
-
-    private void setupPreferences() {
         addPreferencesFromResource(R.xml.pref_kitchen_scanner);
     }
 }

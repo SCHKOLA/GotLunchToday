@@ -24,7 +24,11 @@
 
 package de.schkola.kitchenscanner.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -33,20 +37,25 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
+
+import com.google.common.io.ByteStreams;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.task.CSVCopy;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private SettingsActivity instance;
+    private static final int REQUEST_CODE_DAY = 42;
+    private static final int REQUEST_CODE_ALLERGY = 43;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        instance = this;
         //Set die Activity Fullscreen
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -70,7 +79,34 @@ public class SettingsActivity extends AppCompatActivity {
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.copy_title)
                         .setMessage(R.string.copy_request)
-                        .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> new CSVCopy(instance).execute())
+                        .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+                                new CSVCopy(this, false).execute();
+                            } else {
+                                Toast.makeText(this, "Bitte wähle die Tagesdatei!", Toast.LENGTH_LONG);
+                                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                                intent.setType("text/*");
+                                startActivityForResult(intent, REQUEST_CODE_DAY);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null)
+                        .create().show();
+                return true;
+            case R.id.action_CSV_copy_allergy:
+                //Start copy CSV-Files
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.copy_title)
+                        .setMessage(R.string.copy_request)
+                        .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+                                new CSVCopy(this, true).execute();
+                            } else {
+                                Toast.makeText(this, "Bitte wähle die Allergiedatei!", Toast.LENGTH_LONG);
+                                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                                intent.setType("text/*");
+                                startActivityForResult(intent, REQUEST_CODE_ALLERGY);
+                            }
+                        })
                         .setNegativeButton(android.R.string.no, null)
                         .create().show();
                 return true;
@@ -80,7 +116,7 @@ public class SettingsActivity extends AppCompatActivity {
                         .setTitle(R.string.delete_title)
                         .setMessage(R.string.delete_request)
                         .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
-                            for (File f : MainActivity.getLunchDir().listFiles()) {
+                            for (File f : getDir("Lunch", MainActivity.MODE_PRIVATE).listFiles()) {
                                 f.delete();
                             }
                         })
@@ -90,6 +126,29 @@ public class SettingsActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        if ((requestCode == REQUEST_CODE_DAY || requestCode == REQUEST_CODE_ALLERGY) && resultCode == Activity.RESULT_OK) {
+            if (resultData != null) {
+                Uri uri = resultData.getData();
+                try {
+                    copyFromUri(uri, requestCode == REQUEST_CODE_ALLERGY);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private long copyFromUri(Uri uri, boolean allergy) throws IOException {
+        File csv = getDir("CSV", Activity.MODE_PRIVATE);
+        if (!csv.exists()) {
+            csv.mkdir();
+        }
+        File csv_file = new File(csv, allergy ? "allergy.csv" : "day.csv");
+        return ByteStreams.copy(getContentResolver().openInputStream(uri), new FileOutputStream(csv_file.getAbsolutePath()));
     }
 
     private void setupActionBar() {

@@ -32,8 +32,13 @@ import android.os.AsyncTask;
 public class DoLaterTask extends AsyncTask<Void, Void, Void> {
 
     private long millis;
-    private Runnable before;
+    private Runnable before = null;
     private Runnable after;
+
+    public DoLaterTask(long millis, Runnable after) {
+        this.millis = millis;
+        this.after = after;
+    }
 
     public DoLaterTask(long millis, Runnable before, Runnable after) {
         this.millis = millis;
@@ -43,7 +48,9 @@ public class DoLaterTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected void onPreExecute() {
-        before.run();
+        if (before != null) {
+            before.run();
+        }
     }
 
     @Override

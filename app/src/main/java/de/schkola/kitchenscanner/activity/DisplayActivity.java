@@ -31,6 +31,7 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
@@ -38,11 +39,10 @@ import android.widget.TextView;
 
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.task.DoLaterTask;
-import de.schkola.kitchenscanner.task.RescanTask;
 
 public class DisplayActivity extends AppCompatActivity {
 
-    private static RescanTask rct;
+    private static DoLaterTask rct;
     private static Camera camera;
 
     public static void setFlashLight(boolean b) {
@@ -83,7 +83,6 @@ public class DisplayActivity extends AppCompatActivity {
             try {
                 manager.setTorchMode("0", true);
                 new DoLaterTask(250, () -> {
-                }, () -> {
                     try {
                         manager.setTorchMode("0", false);
                     } catch (CameraAccessException ignored) {
@@ -107,8 +106,15 @@ public class DisplayActivity extends AppCompatActivity {
             tv_gotLunch.setText(String.format("%s%s%s", getString(R.string.gotLunch_2), String.valueOf(intent.getIntExtra("gotLunch", 0)), getString(R.string.gotLunch_1)));
         }
         ((TextView) findViewById(R.id.allergie)).setText(intent.getStringExtra("allergies"));
-        //Start new Rescan task
-        rct = new RescanTask(this);
+        //Start rescan
+        rct = new DoLaterTask(getSleepTimeMillis(), () -> {
+            finish();
+            MainActivity.startScan();
+        });
         rct.execute();
+    }
+
+    private int getSleepTimeMillis() {
+        return Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(this).getString("rescan", "2")) * 1000;
     }
 }

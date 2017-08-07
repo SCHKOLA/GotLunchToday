@@ -24,7 +24,6 @@
 
 package de.schkola.kitchenscanner.activity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -46,53 +45,53 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import de.schkola.kitchenscanner.R;
-import de.schkola.kitchenscanner.util.CSVFile_Allergie;
-import de.schkola.kitchenscanner.util.CSVFile_Teilnahme;
+import de.schkola.kitchenscanner.util.CSVFile_Allergy;
+import de.schkola.kitchenscanner.util.CSVFile_Day;
 import de.schkola.kitchenscanner.util.Person;
 
 public class MainActivity extends AppCompatActivity {
 
     private static MainActivity instance;
-    private static File lunch;
 
     /**
      * Lädt die Daten in den App Cache
      */
-    public static void loadDataIntoApp(Activity instance) {
+    public boolean loadDataIntoApp() {
         try {
-            CSVFile_Teilnahme file = new CSVFile_Teilnahme(new FileInputStream(new File(instance.getDir("CSV", MainActivity.MODE_PRIVATE), "teilnahme.csv")));
-            for (String[] line : file.read()) {
+            CSVFile_Day day = new CSVFile_Day(new FileInputStream(new File(getDir("CSV", MODE_PRIVATE), "day.csv")));
+            for (String[] line : day.read()) {
                 try {
-                    new Person(Integer.parseInt(line[3].replace("\"", "")), line[2].replace("\"", ""), line[4].replace("\"", ""), Integer.parseInt(line[5].replace("\"", "")));
+                    new Person(Integer.parseInt(line[3].replace("\"", "")), line[2].replace("\"", ""), line[4].replace("\"", ""), Integer.parseInt(line[5].replace("\"", "")), this);
                 } catch (NumberFormatException ignored) {
                 }
             }
         } catch (UnsupportedEncodingException | ArrayIndexOutOfBoundsException e) {
-            new AlertDialog.Builder(instance)
+            new AlertDialog.Builder(this)
                     .setTitle(R.string.fail_title)
                     .setMessage(R.string.csv_encoding_fail)
                     .setPositiveButton(android.R.string.ok, null)
                     .create().show();
+            return false;
         } catch (FileNotFoundException e) {
-            new AlertDialog.Builder(instance)
+            new AlertDialog.Builder(this)
                     .setTitle(R.string.fail_title)
                     .setMessage(R.string.csv_read_fail)
                     .setPositiveButton(android.R.string.ok, null)
                     .create().show();
+            return false;
         }
         try {
-            CSVFile_Allergie allergie = new CSVFile_Allergie(new FileInputStream(new File(instance.getDir("CSV", MainActivity.MODE_PRIVATE), "allergie.csv")));
-            for (String[] line : allergie.read()) {
+            CSVFile_Allergy allergy = new CSVFile_Allergy(new FileInputStream(new File(getDir("CSV", MODE_PRIVATE), "allergy.csv")));
+            for (String[] line : allergy.read()) {
                 Person person = Person.getByXBA(Integer.parseInt(line[0]));
                 if (person != null) {
                     person.addAllergy(line[1]);
                 }
             }
+            return true;
         } catch (UnsupportedEncodingException | FileNotFoundException | ArrayIndexOutOfBoundsException ignored) {
         }
-        if (!lunch.exists()) {
-            lunch.mkdir();
-        }
+        return true;
     }
 
     /**
@@ -107,15 +106,14 @@ public class MainActivity extends AppCompatActivity {
         integrator.initiateScan(qr_code);
     }
 
-    public static File getLunchDir() {
-        return lunch;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         instance = this;
-        lunch = this.getDir("Lunch", MainActivity.MODE_PRIVATE);
+        File lunch = this.getDir("Lunch", MODE_PRIVATE);
+        if (!lunch.exists()) {
+            lunch.mkdir();
+        }
         //Set Activity Fullscreen
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -124,10 +122,13 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        loadDataIntoApp(this);
         //Set Action Buttons
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(view -> startScan());
+        fab.setOnClickListener(view -> {
+            if (loadDataIntoApp()) {
+                startScan();
+            }
+        });
     }
 
     @Override

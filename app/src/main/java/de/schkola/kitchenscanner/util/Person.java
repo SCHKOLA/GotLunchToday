@@ -24,6 +24,7 @@
 
 package de.schkola.kitchenscanner.util;
 
+import android.app.Activity;
 import android.util.SparseArray;
 
 import java.io.BufferedReader;
@@ -32,8 +33,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-
-import de.schkola.kitchenscanner.activity.MainActivity;
 
 /**
  * Diese Klasse repräsentiert eine Person in der deren Daten gespeichert sind.
@@ -47,12 +46,12 @@ public class Person {
     private final File f;
     private String allergies = "";
 
-    public Person(int xba, String clazz, String name, int lunch) {
+    public Person(int xba, String clazz, String name, int lunch, Activity activity) {
         this.clazz = clazz;
         this.person_name = name;
         this.lunch = lunch;
         all.put(xba, this);
-        f = new File(MainActivity.getLunchDir(), xba + ".txt");
+        f = new File(activity.getDir("Lunch", Activity.MODE_PRIVATE), xba + ".txt");
     }
 
     public static Person getByXBA(int xba) {

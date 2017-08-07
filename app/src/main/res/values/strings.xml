@@ -24,7 +24,8 @@
     <string name="copy_title">Kopieren</string>
     <string name="fail_title">Fehler</string>
     <string name="copy_fail">Keine CSV-Datei gefunden</string>
-    <string name="csv_file_copy">CSV-Datei kopieren</string>
+    <string name="csv_file_copy">CSV-Datei (Tag) kopieren</string>
+    <string name="csv_file_copy_allergy">CSV-Datei (Allergie) kopieren</string>
     <string name="csv_encoding_fail">CSV: Kodierungsfehler</string>
     <string name="csv_read_fail">CSV: Konnte nicht gefunden werden</string>
     <string name="gotLunch_1">. mal</string>

@@ -36,10 +36,10 @@ import java.util.List;
  * Für CSV Datei nach Schema
  * [XBA-Nummer],[Allergie]
  */
-public class CSVFile_Allergie {
+public class CSVFile_Allergy {
     private InputStream inputStream;
 
-    public CSVFile_Allergie(InputStream inputStream) {
+    public CSVFile_Allergy(InputStream inputStream) {
         this.inputStream = inputStream;
     }
 
@@ -56,8 +56,7 @@ public class CSVFile_Allergie {
         } finally {
             try {
                 inputStream.close();
-            } catch (IOException e) {
-                throw new RuntimeException("Error while closing input stream: " + e);
+            } catch (IOException ignored) {
             }
         }
         return resultList;

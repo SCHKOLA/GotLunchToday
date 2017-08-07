@@ -22,37 +22,43 @@
  * SOFTWARE.
  */
 
-package de.schkola.kitchenscanner.task;
+package de.schkola.kitchenscanner.util;
 
-import android.app.Activity;
-import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-
-import de.schkola.kitchenscanner.activity.MainActivity;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Dieser Task wird ausgeführt, wenn das Essen angezeigt wird und in ... Sekunden neugescannt wird.
+ * Für CSV Datei nach Schema
+ * [Wochentag];[Datum];[Klassenstufe];[XBA-Nummer];[Nachname], [Vorname];[Essen]
  */
-public class RescanTask extends AsyncTask<Void, Void, Void> {
+public class CSVFile_Day {
+    private InputStream inputStream;
 
-    private Activity instance;
-
-    public RescanTask(Activity instance) {
-        this.instance = instance;
+    public CSVFile_Day(InputStream inputStream) {
+        this.inputStream = inputStream;
     }
 
-    @Override
-    protected Void doInBackground(Void... Void) {
+    public List<String[]> read() throws UnsupportedEncodingException {
+        List<String[]> resultList = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1252"));
         try {
-            Thread.sleep(Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(instance).getString("rescan", "2")) * 1000);
-        } catch (InterruptedException ignored) {
+            String csvLine;
+            while ((csvLine = reader.readLine()) != null) {
+                resultList.add(csvLine.split(";"));
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException("Error in reading CSV file: " + ex);
+        } finally {
+            try {
+                inputStream.close();
+            } catch (IOException ignored) {
+            }
         }
-        return null;
-    }
-
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        instance.finish();
-        MainActivity.startScan();
+        return resultList;
     }
 }
