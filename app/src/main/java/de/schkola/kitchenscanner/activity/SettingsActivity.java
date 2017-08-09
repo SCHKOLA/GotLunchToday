@@ -27,7 +27,6 @@ package de.schkola.kitchenscanner.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -39,14 +38,13 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.google.common.io.ByteStreams;
-
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.FileNotFoundException;
 
 import de.schkola.kitchenscanner.R;
-import de.schkola.kitchenscanner.task.CSVCopy;
+import de.schkola.kitchenscanner.task.CSVSearch;
+import de.schkola.kitchenscanner.task.JsonAllergyTask;
+import de.schkola.kitchenscanner.task.JsonDayTask;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -81,7 +79,7 @@ public class SettingsActivity extends AppCompatActivity {
                         .setMessage(R.string.copy_request)
                         .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-                                new CSVCopy(this, false).execute();
+                                new CSVSearch(this, false).execute();
                             } else {
                                 Toast.makeText(this, "Bitte wähle die Tagesdatei!", Toast.LENGTH_LONG);
                                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -99,7 +97,7 @@ public class SettingsActivity extends AppCompatActivity {
                         .setMessage(R.string.copy_request)
                         .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-                                new CSVCopy(this, true).execute();
+                                new CSVSearch(this, true).execute();
                             } else {
                                 Toast.makeText(this, "Bitte wähle die Allergiedatei!", Toast.LENGTH_LONG);
                                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -130,25 +128,17 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-        if ((requestCode == REQUEST_CODE_DAY || requestCode == REQUEST_CODE_ALLERGY) && resultCode == Activity.RESULT_OK) {
-            if (resultData != null) {
-                Uri uri = resultData.getData();
-                try {
-                    copyFromUri(uri, requestCode == REQUEST_CODE_ALLERGY);
-                } catch (IOException e) {
-                    e.printStackTrace();
+        try {
+            if (resultCode == Activity.RESULT_OK && resultData != null) {
+                if (requestCode == REQUEST_CODE_DAY) {
+                    new JsonDayTask(getContentResolver().openInputStream(resultData.getData()), this).execute();
+                } else if (requestCode == REQUEST_CODE_ALLERGY) {
+                    new JsonAllergyTask(getContentResolver().openInputStream(resultData.getData()), this).execute();
                 }
             }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
-    }
-
-    private long copyFromUri(Uri uri, boolean allergy) throws IOException {
-        File csv = getDir("CSV", Activity.MODE_PRIVATE);
-        if (!csv.exists()) {
-            csv.mkdir();
-        }
-        File csv_file = new File(csv, allergy ? "allergy.csv" : "day.csv");
-        return ByteStreams.copy(getContentResolver().openInputStream(uri), new FileOutputStream(csv_file.getAbsolutePath()));
     }
 
     private void setupActionBar() {

@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '26.0.0'
+    buildToolsVersion '26.0.1'
 
     defaultConfig {
         applicationId "de.schkola.kitchenscanner"
@@ -31,5 +31,4 @@ dependencies {
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.journeyapps:zxing-android-embedded:3.5.0'
-    compile 'com.google.guava:guava:22.0-android'
 }

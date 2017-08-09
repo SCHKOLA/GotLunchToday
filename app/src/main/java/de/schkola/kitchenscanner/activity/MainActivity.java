@@ -39,14 +39,12 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import de.schkola.kitchenscanner.R;
-import de.schkola.kitchenscanner.util.CSVFile_Allergy;
-import de.schkola.kitchenscanner.util.CSVFile_Day;
+import de.schkola.kitchenscanner.util.JsonAllergyParser;
+import de.schkola.kitchenscanner.util.JsonDayParser;
 import de.schkola.kitchenscanner.util.Person;
 
 public class MainActivity extends AppCompatActivity {
@@ -54,25 +52,12 @@ public class MainActivity extends AppCompatActivity {
     private static MainActivity instance;
 
     /**
-     * Lädt die Daten in den App Cache
+     * Loads data into the app cache
      */
     public boolean loadDataIntoApp() {
         try {
-            CSVFile_Day day = new CSVFile_Day(new FileInputStream(new File(getDir("CSV", MODE_PRIVATE), "day.csv")));
-            for (String[] line : day.read()) {
-                try {
-                    new Person(Integer.parseInt(line[3].replace("\"", "")), line[2].replace("\"", ""), line[4].replace("\"", ""), Integer.parseInt(line[5].replace("\"", "")), this);
-                } catch (NumberFormatException ignored) {
-                }
-            }
-        } catch (UnsupportedEncodingException | ArrayIndexOutOfBoundsException e) {
-            new AlertDialog.Builder(this)
-                    .setTitle(R.string.fail_title)
-                    .setMessage(R.string.csv_encoding_fail)
-                    .setPositiveButton(android.R.string.ok, null)
-                    .create().show();
-            return false;
-        } catch (FileNotFoundException e) {
+            new JsonDayParser(new File(getDir("JSON", MODE_PRIVATE), "day.json"), this).parse();
+        } catch (IOException e) {
             new AlertDialog.Builder(this)
                     .setTitle(R.string.fail_title)
                     .setMessage(R.string.csv_read_fail)
@@ -81,21 +66,14 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
         try {
-            CSVFile_Allergy allergy = new CSVFile_Allergy(new FileInputStream(new File(getDir("CSV", MODE_PRIVATE), "allergy.csv")));
-            for (String[] line : allergy.read()) {
-                Person person = Person.getByXBA(Integer.parseInt(line[0]));
-                if (person != null) {
-                    person.addAllergy(line[1]);
-                }
-            }
-            return true;
-        } catch (UnsupportedEncodingException | FileNotFoundException | ArrayIndexOutOfBoundsException ignored) {
+            new JsonAllergyParser(new File(getDir("JSON", MODE_PRIVATE), "allergy.json")).parse();
+        } catch (IOException ignored) {
         }
         return true;
     }
 
     /**
-     * Startet den Barcodescanner
+     * Starts barcode scan
      */
     public static void startScan() {
         IntentIntegrator integrator = new IntentIntegrator(instance);
@@ -166,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                //Start Settings
+                //Start settings
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             default:

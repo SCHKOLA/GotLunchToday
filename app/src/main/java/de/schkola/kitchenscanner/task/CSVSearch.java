@@ -29,25 +29,22 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 
-import com.google.common.io.ByteStreams;
-
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.FileNotFoundException;
 
 import de.schkola.kitchenscanner.R;
 
 /**
- * Diese Klassen sorgt für das Asyncrone Kopieren der CSV Dateien
+ * Searches needed CSV-Files on the USB disk
  */
-public class CSVCopy extends AsyncTask<Void, Void, Boolean> {
+public class CSVSearch extends AsyncTask<Void, Void, File> {
 
     private final ProgressDialog dialog;
     private final Activity instance;
     private final boolean allergy;
 
-    public CSVCopy(Activity instance, boolean allergy) {
+    public CSVSearch(Activity instance, boolean allergy) {
         this.instance = instance;
         this.allergy = allergy;
         this.dialog = new ProgressDialog(instance);
@@ -62,50 +59,43 @@ public class CSVCopy extends AsyncTask<Void, Void, Boolean> {
     }
 
     @Override
-    protected Boolean doInBackground(Void... voids) {
-        boolean re = false;
-        try {
-            //MountPoint -> If you want to use an other Device CHANGE THIS!
-            File usb = new File("/storage/usbdisk");
-            if (usb.exists()) {
-                for (File f : usb.listFiles()) {
-                    if (!allergy && f.getName().endsWith(".csv") && !f.getName().equals("allergie.csv")) {
-                        File csv = instance.getDir("CSV", Activity.MODE_PRIVATE);
-                        if (!csv.exists()) {
-                            csv.mkdir();
-                        }
-                        File csv_file = new File(csv, "day.csv");
-                        ByteStreams.copy(new FileInputStream(f.getAbsolutePath()), new FileOutputStream(csv_file.getAbsolutePath()));
-                        re = true;
-                    } else if (allergy && f.getName().equals("allergie.csv")) {
-                        File csv = instance.getDir("CSV", Activity.MODE_PRIVATE);
-                        if (!csv.exists()) {
-                            csv.mkdir();
-                        }
-                        File csv_file = new File(csv, "allergy.csv");
-                        ByteStreams.copy(new FileInputStream(f.getAbsolutePath()), new FileOutputStream(csv_file.getAbsolutePath()));
-                    }
+    protected File doInBackground(Void... voids) {
+        //MountPoint -> If you want to use an other Device CHANGE THIS!
+        File usb = new File("/storage/usbdisk");
+        if (usb.exists()) {
+            for (File f : usb.listFiles()) {
+                if (!allergy && f.getName().endsWith(".csv") && !f.getName().equals("allergie.csv")) {
+                    return f;
+                } else if (allergy && f.getName().equals("allergie.csv")) {
+                    return f;
                 }
             }
-        } catch (IOException ignored) {
         }
-        return re;
+        return null;
     }
 
     @Override
-    protected void onPostExecute(Boolean b) {
+    protected void onPostExecute(File f) {
         dialog.dismiss();
         dialog.cancel();
-        if (!b) {
-            new AlertDialog.Builder(instance)
-                    .setTitle(R.string.fail_title)
-                    .setMessage(R.string.copy_fail)
-                    .setPositiveButton(android.R.string.ok, null)
-                    .create().show();
+        if (f != null) {
+            try {
+                if (allergy) {
+                    new JsonAllergyTask(new FileInputStream(f.getAbsolutePath()), instance).execute();
+                } else {
+                    new JsonDayTask(new FileInputStream(f.getAbsolutePath()), instance).execute();
+                }
+            } catch (FileNotFoundException e) {
+                new AlertDialog.Builder(instance)
+                        .setTitle(R.string.fail_title)
+                        .setMessage(R.string.csv_read_fail)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .create().show();
+            }
         } else {
             new AlertDialog.Builder(instance)
-                    .setTitle(R.string.success_title)
-                    .setMessage(R.string.copy_success)
+                    .setTitle(R.string.fail_title)
+                    .setMessage(R.string.csv_read_fail)
                     .setPositiveButton(android.R.string.ok, null)
                     .create().show();
         }
