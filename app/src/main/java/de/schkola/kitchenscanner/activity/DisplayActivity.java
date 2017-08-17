@@ -54,17 +54,19 @@ public class DisplayActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        Camera.Parameters p = camera.getParameters();
-        if (b) {
-            // Turn on
-            p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-            camera.setParameters(p);
-        } else {
-            // Turn off
-            p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-            camera.setParameters(p);
-            camera.release();
-            camera = null;
+        if (camera != null) {
+            Camera.Parameters p = camera.getParameters();
+            if (b) {
+                // Turn on
+                p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                camera.setParameters(p);
+            } else {
+                // Turn off
+                p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                camera.setParameters(p);
+                camera.release();
+                camera = null;
+            }
         }
     }
 

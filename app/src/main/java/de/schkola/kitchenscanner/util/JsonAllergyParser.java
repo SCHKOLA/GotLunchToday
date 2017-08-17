@@ -54,7 +54,10 @@ public class JsonAllergyParser {
         }
         reader.endObject();
         if (allergy != null) {
-            Person.getByXBA(xba).addAllergy(allergy);
+            Person p = Person.getByXBA(xba);
+            if (p != null) {
+                p.addAllergy(allergy);
+            }
         }
     }
 
