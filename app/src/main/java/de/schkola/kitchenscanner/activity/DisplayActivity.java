@@ -15,7 +15,7 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -33,8 +33,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.TextView;
 
 import de.schkola.kitchenscanner.R;
@@ -45,7 +43,7 @@ public class DisplayActivity extends AppCompatActivity {
     private static DoLaterTask rct;
     private static Camera camera;
 
-    public static void setFlashLight(boolean b) {
+    private static void setFlashLight(boolean b) {
         if (camera == null) {
             try {
                 camera = Camera.open();
@@ -93,9 +91,6 @@ public class DisplayActivity extends AppCompatActivity {
             } catch (CameraAccessException ignored) {
             }
         }
-        //Set die Activity Fullscreen
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //Set Content
         setContentView(R.layout.activity_display);
         Intent intent = getIntent();
@@ -103,11 +98,11 @@ public class DisplayActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.name)).setText(intent.getStringExtra("name"));
         ((TextView) findViewById(R.id.clazz)).setText(intent.getStringExtra("class"));
         ((TextView) findViewById(R.id.lunch)).setText(intent.getStringExtra("lunch"));
-        TextView tv_gotLunch = (TextView) findViewById(R.id.gotToday);
+        TextView tv_gotLunch = findViewById(R.id.gotToday);
         if (intent.getIntExtra("gotLunch", 0) > 1) {
-            tv_gotLunch.setText(String.format("%s%s%s", getString(R.string.gotLunch_2), String.valueOf(intent.getIntExtra("gotLunch", 0)), getString(R.string.gotLunch_1)));
+            tv_gotLunch.setText(String.format(getString(R.string.gotLunch), intent.getIntExtra("gotLunch", 0)));
         }
-        ((TextView) findViewById(R.id.allergie)).setText(intent.getStringExtra("allergies"));
+        ((TextView) findViewById(R.id.allergies)).setText(intent.getStringExtra("allergies"));
         //Start rescan
         rct = new DoLaterTask(getSleepTimeMillis(), () -> {
             finish();

@@ -55,7 +55,7 @@
             android:textSize="@dimen/text_normal" />
 
         <TextView
-            android:id="@+id/allergie"
+            android:id="@+id/allergies"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"

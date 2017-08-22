@@ -15,7 +15,7 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -24,7 +24,6 @@
 
 package de.schkola.kitchenscanner.task;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
@@ -41,16 +40,15 @@ import de.schkola.kitchenscanner.R;
 public class CSVSearch extends AsyncTask<Void, Void, File> {
 
     private final ProgressDialog dialog;
-    private final Activity instance;
+    private final JsonScanTask jsonTask;
     private final boolean allergy;
+    private final AlertDialog.Builder builder;
 
-    public CSVSearch(Activity instance, boolean allergy) {
-        this.instance = instance;
+    public CSVSearch(ProgressDialog dialog, JsonScanTask jsonTask, AlertDialog.Builder builder, boolean allergy) {
+        this.jsonTask = jsonTask;
         this.allergy = allergy;
-        this.dialog = new ProgressDialog(instance);
-        this.dialog.setCancelable(false);
-        this.dialog.setTitle(instance.getString(R.string.copy_title));
-        this.dialog.setMessage(instance.getString(R.string.copy_alert));
+        this.dialog = dialog;
+        this.builder = builder;
     }
 
     @Override
@@ -80,24 +78,14 @@ public class CSVSearch extends AsyncTask<Void, Void, File> {
         dialog.cancel();
         if (f != null) {
             try {
-                if (allergy) {
-                    new JsonAllergyTask(new FileInputStream(f.getAbsolutePath()), instance).execute();
-                } else {
-                    new JsonDayTask(new FileInputStream(f.getAbsolutePath()), instance).execute();
-                }
-            } catch (FileNotFoundException e) {
-                new AlertDialog.Builder(instance)
-                        .setTitle(R.string.fail_title)
-                        .setMessage(R.string.csv_read_fail)
-                        .setPositiveButton(android.R.string.ok, null)
-                        .create().show();
+                jsonTask.execute(new FileInputStream(f.getAbsolutePath()));
+                return;
+            } catch (FileNotFoundException ignored) {
             }
-        } else {
-            new AlertDialog.Builder(instance)
-                    .setTitle(R.string.fail_title)
-                    .setMessage(R.string.csv_read_fail)
-                    .setPositiveButton(android.R.string.ok, null)
-                    .create().show();
         }
+        builder.setTitle(R.string.error)
+                .setMessage(R.string.no_file_found)
+                .setPositiveButton(android.R.string.ok, null)
+                .create().show();
     }
 }

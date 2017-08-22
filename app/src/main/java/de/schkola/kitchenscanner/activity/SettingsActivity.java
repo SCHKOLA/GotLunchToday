@@ -15,7 +15,7 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -26,16 +26,14 @@ package de.schkola.kitchenscanner.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import java.io.File;
@@ -43,8 +41,7 @@ import java.io.FileNotFoundException;
 
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.task.CSVSearch;
-import de.schkola.kitchenscanner.task.JsonAllergyTask;
-import de.schkola.kitchenscanner.task.JsonDayTask;
+import de.schkola.kitchenscanner.task.JsonScanTask;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -54,13 +51,9 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Set die Activity Fullscreen
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //Set Content
         setContentView(R.layout.activity_settings);
         getFragmentManager().beginTransaction().replace(R.id.content_frame, new SettingsFragment()).commit();
-        setupActionBar();
     }
 
     @Override
@@ -75,43 +68,25 @@ public class SettingsActivity extends AppCompatActivity {
             case R.id.action_CSV_copy:
                 //Start copy CSV-Files
                 new AlertDialog.Builder(this)
-                        .setTitle(R.string.copy_title)
+                        .setTitle(R.string.copy)
                         .setMessage(R.string.copy_request)
-                        .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
-                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-                                new CSVSearch(this, false).execute();
-                            } else {
-                                Toast.makeText(this, "Bitte wähle die Tagesdatei!", Toast.LENGTH_LONG);
-                                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                                intent.setType("text/*");
-                                startActivityForResult(intent, REQUEST_CODE_DAY);
-                            }
-                        })
+                        .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> startCopy(false))
                         .setNegativeButton(android.R.string.no, null)
                         .create().show();
                 return true;
             case R.id.action_CSV_copy_allergy:
                 //Start copy CSV-Files
                 new AlertDialog.Builder(this)
-                        .setTitle(R.string.copy_title)
+                        .setTitle(R.string.copy)
                         .setMessage(R.string.copy_request)
-                        .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
-                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-                                new CSVSearch(this, true).execute();
-                            } else {
-                                Toast.makeText(this, "Bitte wähle die Allergiedatei!", Toast.LENGTH_LONG);
-                                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                                intent.setType("text/*");
-                                startActivityForResult(intent, REQUEST_CODE_ALLERGY);
-                            }
-                        })
+                        .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> startCopy(true))
                         .setNegativeButton(android.R.string.no, null)
                         .create().show();
                 return true;
             case R.id.action_delete_data:
                 //Delete Cache
                 new AlertDialog.Builder(this)
-                        .setTitle(R.string.delete_title)
+                        .setTitle(R.string.delete)
                         .setMessage(R.string.delete_request)
                         .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
                             for (File f : getDir("Lunch", MainActivity.MODE_PRIVATE).listFiles()) {
@@ -126,27 +101,41 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
+    private void startCopy(boolean allergy) {
+        ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setCancelable(false);
+        dialog.setTitle(getString(R.string.copy));
+        dialog.setMessage(getString(R.string.copy_ongoing));
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            new CSVSearch(dialog, createScanTask(allergy), new AlertDialog.Builder(this), allergy).execute();
+        } else {
+            String text = allergy ? "Bitte wähle die Allergiedatei!" : "Bitte wähle die Tagesdatei!";
+            Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("text/*");
+            startActivityForResult(intent, allergy ? REQUEST_CODE_ALLERGY : REQUEST_CODE_DAY);
+        }
+    }
+
+    private JsonScanTask createScanTask(boolean allergy) {
+        ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setCancelable(false);
+        dialog.setTitle(getString(R.string.copy));
+        dialog.setMessage(getString(R.string.copy_ongoing));
+        return new JsonScanTask(dialog, getDir("JSON", Activity.MODE_PRIVATE), allergy);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         try {
-            if (resultCode == Activity.RESULT_OK && resultData != null) {
-                if (requestCode == REQUEST_CODE_DAY) {
-                    new JsonDayTask(getContentResolver().openInputStream(resultData.getData()), this).execute();
-                } else if (requestCode == REQUEST_CODE_ALLERGY) {
-                    new JsonAllergyTask(getContentResolver().openInputStream(resultData.getData()), this).execute();
+            if (resultData != null && resultCode == Activity.RESULT_OK) {
+                Uri data = resultData.getData();
+                if (data != null) {
+                    createScanTask(requestCode == REQUEST_CODE_ALLERGY).execute(getContentResolver().openInputStream(data));
                 }
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
-    }
-
-    private void setupActionBar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 }

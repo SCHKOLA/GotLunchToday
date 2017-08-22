@@ -15,7 +15,7 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -29,11 +29,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -50,24 +47,28 @@ import de.schkola.kitchenscanner.util.Person;
 public class MainActivity extends AppCompatActivity {
 
     private static MainActivity instance;
+    private static boolean loaded = false;
 
     /**
      * Loads data into the app cache
      */
-    public boolean loadDataIntoApp() {
-        try {
-            new JsonDayParser(new File(getDir("JSON", MODE_PRIVATE), "day.json"), this).parse();
-        } catch (IOException e) {
-            new AlertDialog.Builder(this)
-                    .setTitle(R.string.fail_title)
-                    .setMessage(R.string.csv_read_fail)
-                    .setPositiveButton(android.R.string.ok, null)
-                    .create().show();
-            return false;
-        }
-        try {
-            new JsonAllergyParser(new File(getDir("JSON", MODE_PRIVATE), "allergy.json")).parse();
-        } catch (IOException ignored) {
+    private boolean loadDataIntoApp() {
+        if (!loaded) {
+            try {
+                new JsonDayParser(new File(getDir("JSON", MODE_PRIVATE), "day.json"), this).parse();
+            } catch (IOException e) {
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.error)
+                        .setMessage(R.string.no_file_found)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .create().show();
+                return false;
+            }
+            try {
+                new JsonAllergyParser(new File(getDir("JSON", MODE_PRIVATE), "allergy.json")).parse();
+            } catch (IOException ignored) {
+            }
+            loaded = true;
         }
         return true;
     }
@@ -92,16 +93,11 @@ public class MainActivity extends AppCompatActivity {
         if (!lunch.exists()) {
             lunch.mkdir();
         }
-        //Set Activity Fullscreen
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //Set Content
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         //Set Action Buttons
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
             if (loadDataIntoApp()) {
                 startScan();
@@ -117,12 +113,12 @@ public class MainActivity extends AppCompatActivity {
                 Person person = Person.getByXBA(Integer.parseInt(scanResult.getContents()));
                 Intent intent = new Intent(this, DisplayActivity.class);
                 if (person != null) {
+                    person.gotLunch();
                     intent.putExtra("name", person.getPersonName());
                     intent.putExtra("class", person.getClazz());
                     intent.putExtra("lunch", person.getLunch());
-                    intent.putExtra("gotLunch", person.getGotLunch() + 1);
+                    intent.putExtra("gotLunch", person.getGotLunch());
                     intent.putExtra("allergies", person.getAllergies());
-                    person.gotLunch();
                 } else {
                     intent.putExtra("lunch", "X");
                 }
@@ -147,6 +143,10 @@ public class MainActivity extends AppCompatActivity {
                 //Start settings
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
+            case R.id.action_stats:
+                if (loadDataIntoApp()) {
+                    startActivity(new Intent(this, StatsActivity.class));
+                }
             default:
                 return super.onOptionsItemSelected(item);
         }

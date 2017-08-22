@@ -15,7 +15,7 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -35,16 +35,17 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * Diese Klasse repräsentiert eine Person in der deren Daten gespeichert sind.
+ * Contains the data of a Person
  */
 public class Person {
 
-    private static SparseArray<Person> all = new SparseArray<>();
+    private static final SparseArray<Person> all = new SparseArray<>();
     private final String person_name;
     private final String clazz;
     private final int lunch;
     private final File f;
     private String allergies = "";
+    private int gotLunch = -1;
 
     public Person(int xba, String clazz, String name, int lunch, Activity activity) {
         this.clazz = clazz;
@@ -56,6 +57,10 @@ public class Person {
 
     public static Person getByXBA(int xba) {
         return all.get(xba);
+    }
+
+    public static SparseArray<Person> getPersons() {
+        return all;
     }
 
     private File getLunchFile() {
@@ -79,19 +84,26 @@ public class Person {
         }
     }
 
+    public int getRawLunch() {
+        return lunch;
+    }
+
     public String getPersonName() {
         return person_name;
     }
 
     public int getGotLunch() {
-        try {
-            BufferedReader buffer = new BufferedReader(new FileReader(getLunchFile()));
-            String lunch = buffer.readLine();
-            buffer.close();
-            return Integer.parseInt(lunch);
-        } catch (Exception e) {
-            return 0;
+        if (gotLunch == -1) {
+            try {
+                BufferedReader buffer = new BufferedReader(new FileReader(getLunchFile()));
+                String lunch = buffer.readLine();
+                buffer.close();
+                gotLunch = Integer.parseInt(lunch);
+            } catch (Exception e) {
+                gotLunch = 0;
+            }
         }
+        return gotLunch;
     }
 
     public String getAllergies() {
@@ -107,12 +119,12 @@ public class Person {
     }
 
     public void gotLunch() {
-        int lunch = getGotLunch();
+        gotLunch = getGotLunch() + 1;
         getLunchFile().delete();
         try {
             FileOutputStream fos = new FileOutputStream(getLunchFile());
             PrintWriter pw = new PrintWriter(fos);
-            pw.println(lunch + 1);
+            pw.println(gotLunch);
             pw.flush();
             pw.close();
             fos.close();
