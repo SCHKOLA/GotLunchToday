@@ -69,12 +69,12 @@ public class StatsActivity extends AppCompatActivity {
             case R.id.action_list:
                 setContent(R.layout.content_stats_list);
                 item.setVisible(false);
-                menu.getItem(0).setVisible(true);
+                menu.findItem(R.id.action_chart).setVisible(true);
                 return true;
             case R.id.action_chart:
                 setContent(R.layout.content_stats_overview);
                 item.setVisible(false);
-                menu.getItem(1).setVisible(true);
+                menu.findItem(R.id.action_list).setVisible(true);
                 return true;
         }
         return super.onOptionsItemSelected(item);
