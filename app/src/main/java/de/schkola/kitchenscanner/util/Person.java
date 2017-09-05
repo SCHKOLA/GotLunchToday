@@ -131,4 +131,8 @@ public class Person {
         } catch (IOException ignored) {
         }
     }
+
+    public void resetGotLunch() {
+        gotLunch = -1;
+    }
 }

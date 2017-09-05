@@ -32,6 +32,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -42,6 +43,7 @@ import java.io.FileNotFoundException;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.task.CSVSearch;
 import de.schkola.kitchenscanner.task.JsonScanTask;
+import de.schkola.kitchenscanner.util.Person;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -92,6 +94,11 @@ public class SettingsActivity extends AppCompatActivity {
                             for (File f : getDir("Lunch", MainActivity.MODE_PRIVATE).listFiles()) {
                                 f.delete();
                             }
+                            SparseArray<Person> array = Person.getPersons();
+                            for (int j = 0; j < array.size(); j++) {
+                                Person p = array.get(array.keyAt(j));
+                                p.resetGotLunch();
+                            }
                         })
                         .setNegativeButton(android.R.string.no, null)
                         .create().show();
@@ -109,7 +116,7 @@ public class SettingsActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             new CSVSearch(dialog, createScanTask(allergy), new AlertDialog.Builder(this), allergy).execute();
         } else {
-            String text = allergy ? "Bitte wähle die Allergiedatei!" : "Bitte wähle die Tagesdatei!";
+            int text = allergy ? R.string.choose_allergy : R.string.choose_day;
             Toast.makeText(this, text, Toast.LENGTH_LONG).show();
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("text/*");
