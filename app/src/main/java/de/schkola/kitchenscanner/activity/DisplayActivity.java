@@ -80,15 +80,17 @@ public class DisplayActivity extends AppCompatActivity {
             new DoLaterTask(250, () -> DisplayActivity.setFlashLight(true), () -> DisplayActivity.setFlashLight(false)).execute();
         } else {
             CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-            try {
-                manager.setTorchMode("0", true);
-                new DoLaterTask(250, () -> {
-                    try {
-                        manager.setTorchMode("0", false);
-                    } catch (CameraAccessException ignored) {
-                    }
-                });
-            } catch (CameraAccessException ignored) {
+            if (manager != null) {
+                try {
+                    manager.setTorchMode("0", true);
+                    new DoLaterTask(250, () -> {
+                        try {
+                            manager.setTorchMode("0", false);
+                        } catch (CameraAccessException ignored) {
+                        }
+                    });
+                } catch (CameraAccessException ignored) {
+                }
             }
         }
         //Set Content

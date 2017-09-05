@@ -80,7 +80,7 @@ public class StatsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void setContent(int layout) {
+    private void setContent(int layout) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.container, FragmentMgr.newInstance(layout)).commit();
         switch (layout) {

@@ -15,10 +15,10 @@ import de.schkola.kitchenscanner.R;
 
 public class LunchListAdapter extends BaseExpandableListAdapter {
 
-    private Context context;
-    private JSONArray getLunchA;
-    private JSONArray getLunchB;
-    private JSONArray getLunchS;
+    private final Context context;
+    private final JSONArray getLunchA;
+    private final JSONArray getLunchB;
+    private final JSONArray getLunchS;
 
     public LunchListAdapter(Context context, JSONArray getLunchA, JSONArray getLunchB, JSONArray getLunchS) {
         this.context = context;
@@ -58,7 +58,7 @@ public class LunchListAdapter extends BaseExpandableListAdapter {
     @Override
     public int getChildrenCount(int groupPosition) {
         JSONArray jsonArray = (JSONArray) getGroup(groupPosition);
-        return jsonArray != null ? jsonArray.length() : null;
+        return jsonArray != null ? jsonArray.length() : 0;
     }
 
     @Override
@@ -87,19 +87,19 @@ public class LunchListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-        String headerTitle;
+        int headerTitle;
         switch (groupPosition) {
             case 0:
-                headerTitle = "Auszugegebende Essen A";
+                headerTitle = R.string.getLunchA;
                 break;
             case 1:
-                headerTitle = "Auszugegebende Essen B";
+                headerTitle = R.string.getLunchB;
                 break;
             case 2:
-                headerTitle = "Auszugegebende Essen S";
+                headerTitle = R.string.getLunchS;
                 break;
             default:
-                headerTitle = "";
+                headerTitle = 0;
         }
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

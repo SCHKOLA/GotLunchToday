@@ -43,4 +43,7 @@
     <string name="A">A</string>
     <string name="choose_allergy">Bitte wähle die Allergiedatei!</string>
     <string name="choose_day">Bitte wähle die Tagesdatei!</string>
+    <string name="getLunchA">Auszugegebende Essen A</string>
+    <string name="getLunchB">Auszugegebende Essen B</string>
+    <string name="getLunchS">Auszugegebende Essen S</string>
 </resources>
