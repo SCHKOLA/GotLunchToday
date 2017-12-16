@@ -35,12 +35,15 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import de.schkola.kitchenscanner.R;
-import de.schkola.kitchenscanner.task.DoLaterTask;
 
 public class DisplayActivity extends AppCompatActivity {
 
-    private static DoLaterTask rct;
+    private static final ScheduledExecutorService s = Executors.newScheduledThreadPool(2);
     private static Camera camera;
 
     private static void setFlashLight(boolean b) {
@@ -70,27 +73,23 @@ public class DisplayActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //Stop last RescanTask (Bug-Fix)
-        if (rct != null) {
-            rct.cancel(true);
-        }
         super.onCreate(savedInstanceState);
-        //Start DoLaterTask
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            new DoLaterTask(250, () -> DisplayActivity.setFlashLight(true), () -> DisplayActivity.setFlashLight(false)).execute();
+            DisplayActivity.setFlashLight(true);
+            s.schedule(() -> DisplayActivity.setFlashLight(false), 150, TimeUnit.MILLISECONDS);
         } else {
             CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
             if (manager != null) {
                 try {
                     manager.setTorchMode("0", true);
-                    new DoLaterTask(250, () -> {
-                        try {
-                            manager.setTorchMode("0", false);
-                        } catch (CameraAccessException ignored) {
-                        }
-                    });
                 } catch (CameraAccessException ignored) {
                 }
+                s.schedule(() -> {
+                    try {
+                        manager.setTorchMode("0", false);
+                    } catch (CameraAccessException ignored) {
+                    }
+                }, 150, TimeUnit.MILLISECONDS);
             }
         }
         //Set Content
@@ -101,16 +100,16 @@ public class DisplayActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.clazz)).setText(intent.getStringExtra("class"));
         ((TextView) findViewById(R.id.lunch)).setText(intent.getStringExtra("lunch"));
         TextView tv_gotLunch = findViewById(R.id.gotToday);
-        if (intent.getIntExtra("gotLunch", 0) > 1) {
-            tv_gotLunch.setText(String.format(getString(R.string.gotLunch), intent.getIntExtra("gotLunch", 0)));
+        byte gotLunch = intent.getByteExtra("gotLunch", (byte) 0);
+        if (gotLunch > 1) {
+            tv_gotLunch.setText(String.format(getString(R.string.gotLunch), gotLunch));
         }
         ((TextView) findViewById(R.id.allergies)).setText(intent.getStringExtra("allergies"));
         //Start rescan
-        rct = new DoLaterTask(getSleepTimeMillis(), () -> {
+        s.schedule(() -> {
             finish();
             MainActivity.startScan();
-        });
-        rct.execute();
+        }, getSleepTimeMillis(), TimeUnit.MILLISECONDS);
     }
 
     private int getSleepTimeMillis() {

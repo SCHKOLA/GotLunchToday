@@ -41,11 +41,8 @@ public class JsonAllergyParser {
 
     public void parse() throws IOException {
         FileInputStream is = new FileInputStream(f.getAbsoluteFile());
-        JsonReader reader = new JsonReader(new InputStreamReader(is, "ISO-8859-1"));
-        try {
+        try (JsonReader reader = new JsonReader(new InputStreamReader(is, "ISO-8859-1"))) {
             readArray(reader);
-        } finally {
-            reader.close();
         }
     }
 
@@ -63,8 +60,7 @@ public class JsonAllergyParser {
 
         reader.beginObject();
         while (reader.hasNext()) {
-            String id = reader.nextName();
-            switch (id) {
+            switch (reader.nextName()) {
                 case "xba":
                     xba = reader.nextInt();
                     break;

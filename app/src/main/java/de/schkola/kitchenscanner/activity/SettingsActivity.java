@@ -39,6 +39,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.task.CSVSearch;
@@ -134,15 +135,17 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-        try {
-            if (resultData != null && resultCode == Activity.RESULT_OK) {
-                Uri data = resultData.getData();
-                if (data != null) {
-                    createScanTask(requestCode == REQUEST_CODE_ALLERGY).execute(getContentResolver().openInputStream(data));
+        if (resultData != null && resultCode == Activity.RESULT_OK) {
+            Uri data = resultData.getData();
+            if (data != null) {
+                InputStream inputStream = null;
+                try {
+                    inputStream = getContentResolver().openInputStream(data);
+                } catch (FileNotFoundException ignored) {
+                    return;
                 }
+                createScanTask(requestCode == REQUEST_CODE_ALLERGY).execute(inputStream);
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         }
     }
 }

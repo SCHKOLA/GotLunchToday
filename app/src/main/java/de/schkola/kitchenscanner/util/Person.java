@@ -42,12 +42,12 @@ public class Person {
     private static final SparseArray<Person> all = new SparseArray<>();
     private final String person_name;
     private final String clazz;
-    private final int lunch;
+    private final byte lunch;
     private final File f;
     private String allergies = "";
-    private int gotLunch = -1;
+    private byte gotLunch = -1;
 
-    public Person(int xba, String clazz, String name, int lunch, Activity activity) {
+    public Person(int xba, String clazz, String name, byte lunch, Activity activity) {
         this.clazz = clazz;
         this.person_name = name;
         this.lunch = lunch;
@@ -84,7 +84,7 @@ public class Person {
         }
     }
 
-    public int getRawLunch() {
+    public byte getRawLunch() {
         return lunch;
     }
 
@@ -92,13 +92,13 @@ public class Person {
         return person_name;
     }
 
-    public int getGotLunch() {
+    public byte getGotLunch() {
         if (gotLunch == -1) {
             try {
                 BufferedReader buffer = new BufferedReader(new FileReader(getLunchFile()));
                 String lunch = buffer.readLine();
                 buffer.close();
-                gotLunch = Integer.parseInt(lunch);
+                gotLunch = Byte.parseByte(lunch);
             } catch (Exception e) {
                 gotLunch = 0;
             }
@@ -119,7 +119,7 @@ public class Person {
     }
 
     public void gotLunch() {
-        gotLunch = getGotLunch() + 1;
+        gotLunch = (byte) (getGotLunch() + 1);
         getLunchFile().delete();
         try {
             FileOutputStream fos = new FileOutputStream(getLunchFile());

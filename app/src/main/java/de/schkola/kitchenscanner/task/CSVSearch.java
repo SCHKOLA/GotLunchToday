@@ -77,10 +77,14 @@ public class CSVSearch extends AsyncTask<Void, Void, File> {
         dialog.dismiss();
         dialog.cancel();
         if (f != null) {
+            FileInputStream inputStream = null;
             try {
-                jsonTask.execute(new FileInputStream(f.getAbsolutePath()));
-                return;
+                inputStream = new FileInputStream(f.getAbsolutePath());
             } catch (FileNotFoundException ignored) {
+            }
+            if (inputStream != null) {
+                jsonTask.execute(inputStream);
+                return;
             }
         }
         builder.setTitle(R.string.error)

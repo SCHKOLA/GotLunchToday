@@ -44,11 +44,8 @@ public class JsonDayParser {
 
     public void parse() throws IOException {
         FileInputStream is = new FileInputStream(f.getAbsoluteFile());
-        JsonReader reader = new JsonReader(new InputStreamReader(is, "ISO-8859-1"));
-        try {
+        try (JsonReader reader = new JsonReader(new InputStreamReader(is, "ISO-8859-1"))) {
             readArray(reader);
-        } finally {
-            reader.close();
         }
     }
 
@@ -64,12 +61,11 @@ public class JsonDayParser {
         int xba = 0;
         String clazz = null;
         String name = null;
-        int lunch = 0;
+        byte lunch = 0;
 
         reader.beginObject();
         while (reader.hasNext()) {
-            String id = reader.nextName();
-            switch (id) {
+            switch (reader.nextName()) {
                 case "xba":
                     xba = reader.nextInt();
                     break;
@@ -81,7 +77,7 @@ public class JsonDayParser {
                     break;
                 case "lunch":
                     try {
-                        lunch = reader.nextInt();
+                        lunch = (byte) reader.nextInt();
                     } catch (NumberFormatException e) {
                         reader.skipValue();
                         lunch = 0;
