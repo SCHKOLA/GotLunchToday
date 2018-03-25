@@ -28,15 +28,16 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.JsonWriter;
 
-import java.io.BufferedReader;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 public class JsonScanTask extends AsyncTask<InputStream, Void, Boolean> {
 
@@ -58,15 +59,22 @@ public class JsonScanTask extends AsyncTask<InputStream, Void, Boolean> {
     @Override
     protected Boolean doInBackground(InputStream... inputStreams) {
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStreams[0], "ISO-8859-1"));
+            CSVFormat format = CSVFormat.DEFAULT;
+            if (!allergy) {
+                format.withDelimiter(';')
+                        .withSkipHeaderRecord()
+                        .withHeader("WT", "KW", "Klasse", "XBA", "Name", "Gericht");
+            }
+
+            CSVParser csvParser = CSVParser.parse(inputStreams[0], Charset.forName("ISO-8859-1"), format);
             File json = new File(jsonFolder, allergy ? "allergy.json" : "day.json");
             JsonWriter writer = new JsonWriter(new OutputStreamWriter(new FileOutputStream(json), "ISO-8859-1"));
             if (allergy) {
-                scanAllergy(reader, writer);
+                scanAllergy(csvParser, writer);
             } else {
-                scanDay(reader, writer);
+                scanDay(csvParser, writer);
             }
-        } catch (UnsupportedEncodingException | FileNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
@@ -83,51 +91,16 @@ public class JsonScanTask extends AsyncTask<InputStream, Void, Boolean> {
         dialog.cancel();
     }
 
-    private void scanDay(BufferedReader reader, JsonWriter writer) {
-        int clazz = 2;
-        int xba = 3;
-        int name = 4;
-        int lunch = 5;
+    private void scanDay(CSVParser csvParser, JsonWriter writer) {
         try {
             writer.beginArray();
-            String csvLine;
-            boolean first = true;
-            boolean headline = false;
-            while ((csvLine = reader.readLine()) != null) {
-                String[] line = csvLine.split(csvLine.split(",").length > 2 ? "," : ";");
-                if (first) {
-                    for (int i = 0; i < line.length; i++) {
-                        if (line[i].replace("\"", "").equalsIgnoreCase("Klasse")) {
-                            clazz = i;
-                            headline = true;
-                        } else if (line[i].replace("\"", "").equalsIgnoreCase("XBA")) {
-                            xba = i;
-                            headline = true;
-                        } else if (line[i].replace("\"", "").equalsIgnoreCase("Name")) {
-                            name = i;
-                            headline = true;
-                        } else if (line[i].replace("\"", "").equalsIgnoreCase("Gericht")) {
-                            lunch = i;
-                            headline = true;
-                        }
-                    }
-                    if (!headline) {
-                        writer.beginObject();
-                        writer.name("class").value(line[clazz].replace("\"", ""));
-                        writer.name("xba").value(Integer.parseInt(line[xba].replace("\"", "")));
-                        writer.name("name").value(line[name].replace("\"", ""));
-                        writer.name("lunch").value(line[lunch].replace("\"", ""));
-                        writer.endObject();
-                    }
-                    first = false;
-                } else {
-                    writer.beginObject();
-                    writer.name("class").value(line[clazz].replace("\"", ""));
-                    writer.name("xba").value(Integer.parseInt(line[xba].replace("\"", "")));
-                    writer.name("name").value(line[name].replace("\"", ""));
-                    writer.name("lunch").value(line[lunch].replace("\"", ""));
-                    writer.endObject();
-                }
+            for (CSVRecord record : csvParser) {
+                writer.beginObject();
+                writer.name("class").value(record.get("Klasse"));
+                writer.name("xba").value(Integer.parseInt(record.get("XBA")));
+                writer.name("name").value(record.get("Name"));
+                writer.name("lunch").value(record.get("Gericht"));
+                writer.endObject();
             }
             writer.endArray();
             writer.close();
@@ -136,17 +109,15 @@ public class JsonScanTask extends AsyncTask<InputStream, Void, Boolean> {
         }
     }
 
-    private void scanAllergy(BufferedReader reader, JsonWriter writer) {
+    private void scanAllergy(CSVParser csvParser, JsonWriter writer) {
         int xba = 0;
         int allergy = 1;
         try {
             writer.beginArray();
-            String csvLine;
-            while ((csvLine = reader.readLine()) != null) {
-                String[] line = csvLine.split(",");
+            for (CSVRecord record : csvParser) {
                 writer.beginObject();
-                writer.name("xba").value(Integer.parseInt(line[xba]));
-                writer.name("allergy").value(line[allergy]);
+                writer.name("xba").value(Integer.parseInt(record.get(xba)));
+                writer.name("allergy").value(record.get(allergy));
                 writer.endObject();
             }
             writer.endArray();
