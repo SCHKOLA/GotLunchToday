@@ -66,9 +66,7 @@ public class JsonScanTask extends AsyncTask<InputStream, Void, Boolean> {
             } else {
                 scanDay(reader, writer);
             }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
+        } catch (UnsupportedEncodingException | FileNotFoundException e) {
             e.printStackTrace();
         } finally {
             try {

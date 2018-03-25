@@ -32,21 +32,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.util.JsonAllergyParser;
 import de.schkola.kitchenscanner.util.JsonDayParser;
-import de.schkola.kitchenscanner.util.Person;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static MainActivity instance;
     private static boolean loaded = false;
 
     /**
@@ -55,7 +49,9 @@ public class MainActivity extends AppCompatActivity {
     private boolean loadDataIntoApp() {
         if (!loaded) {
             try {
-                new JsonDayParser(new File(getDir("JSON", MODE_PRIVATE), "day.json"), this).parse();
+                File jsonPath = new File(getDir("JSON", MODE_PRIVATE), "day.json");
+                File personPath = getDir("Lunch", MODE_PRIVATE);
+                new JsonDayParser(jsonPath, personPath).parse();
             } catch (IOException e) {
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.error)
@@ -73,22 +69,9 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    /**
-     * Starts barcode scan
-     */
-    public static void startScan() {
-        IntentIntegrator integrator = new IntentIntegrator(instance);
-        ArrayList<String> qr_code = new ArrayList<>();
-        qr_code.add("QR_CODE");
-        integrator.addExtra("RESULT_DISPLAY_DURATION_MS", 10L);
-        integrator.setBeepEnabled(true);
-        integrator.initiateScan(qr_code);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        instance = this;
         File lunch = this.getDir("Lunch", MODE_PRIVATE);
         if (!lunch.exists()) {
             lunch.mkdir();
@@ -100,34 +83,11 @@ public class MainActivity extends AppCompatActivity {
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
             if (loadDataIntoApp()) {
-                startScan();
+                Intent intent = new Intent(this, DisplayActivity.class);
+                intent.setAction(Intent.ACTION_RUN);
+                startActivity(intent);
             }
         });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        try {
-            IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-            if (scanResult != null && scanResult.getContents() != null) {
-                Person person = Person.getByXBA(Integer.parseInt(scanResult.getContents()));
-                Intent intent = new Intent(this, DisplayActivity.class);
-                if (person != null) {
-                    person.gotLunch();
-                    intent.putExtra("name", person.getPersonName());
-                    intent.putExtra("class", person.getClazz());
-                    intent.putExtra("lunch", person.getLunch());
-                    intent.putExtra("gotLunch", person.getGotLunch());
-                    intent.putExtra("allergies", person.getAllergies());
-                } else {
-                    intent.putExtra("lunch", "X");
-                }
-                startActivity(intent);
-            } else {
-                super.onActivityResult(requestCode, resultCode, data);
-            }
-        } catch (Exception ignored) {
-        }
     }
 
     @Override

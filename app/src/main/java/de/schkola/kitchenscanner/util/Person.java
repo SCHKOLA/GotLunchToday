@@ -24,7 +24,6 @@
 
 package de.schkola.kitchenscanner.util;
 
-import android.app.Activity;
 import android.util.SparseArray;
 
 import java.io.BufferedReader;
@@ -33,6 +32,8 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Contains the data of a Person
@@ -44,15 +45,15 @@ public class Person {
     private final String clazz;
     private final byte lunch;
     private final File f;
-    private String allergies = "";
+    private ArrayList<String> allergies;
     private byte gotLunch = -1;
 
-    public Person(int xba, String clazz, String name, byte lunch, Activity activity) {
+    public Person(int xba, String clazz, String name, byte lunch, File path) {
         this.clazz = clazz;
         this.person_name = name;
         this.lunch = lunch;
         all.put(xba, this);
-        f = new File(activity.getDir("Lunch", Activity.MODE_PRIVATE), xba + ".txt");
+        f = new File(path, xba + ".txt");
     }
 
     public static Person getByXBA(int xba) {
@@ -107,15 +108,17 @@ public class Person {
     }
 
     public String getAllergies() {
-        return allergies;
+        if (allergies == null) {
+            return "";
+        }
+        return Arrays.toString(allergies.toArray()).replaceAll("([\\[\\]])", "");
     }
 
     public void addAllergy(String s) {
-        if (allergies.equals("")) {
-            allergies = s;
-        } else {
-            allergies += ", " + s;
+        if (allergies == null) {
+            allergies = new ArrayList<>();
         }
+        allergies.add(s);
     }
 
     public void gotLunch() {

@@ -29,7 +29,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.SparseArray;
@@ -42,7 +41,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import de.schkola.kitchenscanner.R;
-import de.schkola.kitchenscanner.task.CSVSearch;
 import de.schkola.kitchenscanner.task.JsonScanTask;
 import de.schkola.kitchenscanner.util.Person;
 
@@ -114,15 +112,11 @@ public class SettingsActivity extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.setTitle(getString(R.string.copy));
         dialog.setMessage(getString(R.string.copy_ongoing));
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            new CSVSearch(dialog, createScanTask(allergy), new AlertDialog.Builder(this), allergy).execute();
-        } else {
-            int text = allergy ? R.string.choose_allergy : R.string.choose_day;
-            Toast.makeText(this, text, Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("text/*");
-            startActivityForResult(intent, allergy ? REQUEST_CODE_ALLERGY : REQUEST_CODE_DAY);
-        }
+        int text = allergy ? R.string.choose_allergy : R.string.choose_day;
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("text/*");
+        startActivityForResult(intent, allergy ? REQUEST_CODE_ALLERGY : REQUEST_CODE_DAY);
     }
 
     private JsonScanTask createScanTask(boolean allergy) {
@@ -138,7 +132,7 @@ public class SettingsActivity extends AppCompatActivity {
         if (resultData != null && resultCode == Activity.RESULT_OK) {
             Uri data = resultData.getData();
             if (data != null) {
-                InputStream inputStream = null;
+                InputStream inputStream;
                 try {
                     inputStream = getContentResolver().openInputStream(data);
                 } catch (FileNotFoundException ignored) {

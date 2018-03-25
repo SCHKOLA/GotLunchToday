@@ -24,7 +24,6 @@
 
 package de.schkola.kitchenscanner.util;
 
-import android.app.Activity;
 import android.util.JsonReader;
 
 import java.io.File;
@@ -34,16 +33,16 @@ import java.io.InputStreamReader;
 
 public class JsonDayParser {
 
-    private final File f;
-    private final Activity activity;
+    private final File jsonPath;
+    private final File personPath;
 
-    public JsonDayParser(File f, Activity activity) {
-        this.f = f;
-        this.activity = activity;
+    public JsonDayParser(File jsonPath, File personPath) {
+        this.jsonPath = jsonPath;
+        this.personPath = personPath;
     }
 
     public void parse() throws IOException {
-        FileInputStream is = new FileInputStream(f.getAbsoluteFile());
+        FileInputStream is = new FileInputStream(jsonPath.getAbsoluteFile());
         try (JsonReader reader = new JsonReader(new InputStreamReader(is, "ISO-8859-1"))) {
             readArray(reader);
         }
@@ -90,7 +89,7 @@ public class JsonDayParser {
         }
         reader.endObject();
         if (clazz != null && name != null) {
-            new Person(xba, clazz, name, lunch, activity);
+            new Person(xba, clazz, name, lunch, personPath);
         }
     }
 
