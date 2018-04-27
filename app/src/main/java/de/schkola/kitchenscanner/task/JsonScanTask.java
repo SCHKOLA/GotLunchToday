@@ -61,7 +61,7 @@ public class JsonScanTask extends AsyncTask<InputStream, Void, Boolean> {
         try {
             CSVFormat format = CSVFormat.DEFAULT;
             if (!allergy) {
-                format.withDelimiter(';')
+                format = format.withDelimiter(';')
                         .withSkipHeaderRecord()
                         .withHeader("WT", "KW", "Klasse", "XBA", "Name", "Gericht");
             }
