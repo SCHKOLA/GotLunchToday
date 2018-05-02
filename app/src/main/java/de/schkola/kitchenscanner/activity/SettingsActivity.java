@@ -115,7 +115,9 @@ public class SettingsActivity extends AppCompatActivity {
         int text = allergy ? R.string.choose_allergy : R.string.choose_day;
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("text/csv");
+        intent.setType("*/*");
+        String[] mimetypes = {"text/csv", "text/comma-separated-values"};
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
         startActivityForResult(intent, allergy ? REQUEST_CODE_ALLERGY : REQUEST_CODE_DAY);
     }
 
