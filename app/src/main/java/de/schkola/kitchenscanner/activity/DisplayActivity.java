@@ -54,8 +54,8 @@ public class DisplayActivity extends AppCompatActivity {
     private ScheduledExecutorService s;
     private Camera camera;
     private CameraManager manager;
-    private AVCallback av = new AVCallback();
-    private TCallback t = new TCallback();
+    private AVCallback av;
+    private TCallback t;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +67,8 @@ public class DisplayActivity extends AppCompatActivity {
             while (manager == null) {
                 manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
             }
+            av = new AVCallback();
+            t = new TCallback();
             manager.registerAvailabilityCallback(av, null);
             manager.registerTorchCallback(t, null);
         }
