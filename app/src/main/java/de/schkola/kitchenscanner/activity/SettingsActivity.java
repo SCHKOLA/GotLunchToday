@@ -69,19 +69,23 @@ public class SettingsActivity extends AppCompatActivity {
             case R.id.action_CSV_copy:
                 //Start copy CSV-Files
                 new AlertDialog.Builder(this)
-                        .setTitle(R.string.copy)
-                        .setMessage(R.string.copy_request)
-                        .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> startCopy(false))
-                        .setNegativeButton(android.R.string.no, null)
+                        .setTitle(R.string.csv_import)
+                        .setMessage(R.string.copy_request_day)
+                        .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
+                            deleteFiles();
+                            startCopy(false);
+                        })
+                        .setNegativeButton(R.string.no, (dialog, witch) -> startCopy(false))
+                        .setNeutralButton(R.string.canel, null)
                         .create().show();
                 return true;
             case R.id.action_CSV_copy_allergy:
                 //Start copy CSV-Files
                 new AlertDialog.Builder(this)
-                        .setTitle(R.string.copy)
-                        .setMessage(R.string.copy_request)
-                        .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> startCopy(true))
-                        .setNegativeButton(android.R.string.no, null)
+                        .setTitle(R.string.csv_import)
+                        .setMessage(R.string.copy_request_allergy)
+                        .setPositiveButton(R.string.yes, (dialogInterface, i) -> startCopy(true))
+                        .setNegativeButton(R.string.no, null)
                         .create().show();
                 return true;
             case R.id.action_delete_data:
@@ -89,17 +93,8 @@ public class SettingsActivity extends AppCompatActivity {
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.delete)
                         .setMessage(R.string.delete_request)
-                        .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
-                            for (File f : getDir("Lunch", MainActivity.MODE_PRIVATE).listFiles()) {
-                                f.delete();
-                            }
-                            SparseArray<Person> array = Person.getPersons();
-                            for (int j = 0; j < array.size(); j++) {
-                                Person p = array.get(array.keyAt(j));
-                                p.resetGotLunch();
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, null)
+                        .setPositiveButton(R.string.yes, (dialogInterface, i) -> deleteFiles())
+                        .setNegativeButton(R.string.no, null)
                         .create().show();
                 return true;
             default:
@@ -110,8 +105,8 @@ public class SettingsActivity extends AppCompatActivity {
     private void startCopy(boolean allergy) {
         ProgressDialog dialog = new ProgressDialog(this);
         dialog.setCancelable(false);
-        dialog.setTitle(getString(R.string.copy));
-        dialog.setMessage(getString(R.string.copy_ongoing));
+        dialog.setTitle(getString(R.string.csv_import));
+        dialog.setMessage(getString(R.string.csv_import_ongoing));
         int text = allergy ? R.string.choose_allergy : R.string.choose_day;
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -121,11 +116,22 @@ public class SettingsActivity extends AppCompatActivity {
         startActivityForResult(intent, allergy ? REQUEST_CODE_ALLERGY : REQUEST_CODE_DAY);
     }
 
+    private void deleteFiles() {
+        for (File f : getDir("Lunch", MainActivity.MODE_PRIVATE).listFiles()) {
+            f.delete();
+        }
+        SparseArray<Person> array = Person.getPersons();
+        for (int j = 0; j < array.size(); j++) {
+            Person p = array.get(array.keyAt(j));
+            p.resetGotLunch();
+        }
+    }
+
     private JsonScanTask createScanTask(boolean allergy) {
         ProgressDialog dialog = new ProgressDialog(this);
         dialog.setCancelable(false);
-        dialog.setTitle(getString(R.string.copy));
-        dialog.setMessage(getString(R.string.copy_ongoing));
+        dialog.setTitle(getString(R.string.csv_import));
+        dialog.setMessage(getString(R.string.csv_import_ongoing));
         return new JsonScanTask(dialog, getDir("JSON", Activity.MODE_PRIVATE), allergy);
     }
 

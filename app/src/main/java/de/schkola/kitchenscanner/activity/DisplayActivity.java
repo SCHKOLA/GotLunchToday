@@ -35,6 +35,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -88,7 +89,8 @@ public class DisplayActivity extends AppCompatActivity {
             } else {
                 super.onActivityResult(requestCode, resultCode, data);
             }
-        } catch (Exception ignored) {
+        } catch (Exception ex) {
+            Log.e("DisplayActivity", "Exception onActivityResult", ex);
         }
     }
 
@@ -146,6 +148,7 @@ public class DisplayActivity extends AppCompatActivity {
         IntentIntegrator integrator = new IntentIntegrator(this);
         integrator.addExtra("RESULT_DISPLAY_DURATION_MS", 10L);
         integrator.setBeepEnabled(true);
+        integrator.setOrientationLocked(true);
         integrator.initiateScan(Collections.singletonList("QR_CODE"));
     }
 

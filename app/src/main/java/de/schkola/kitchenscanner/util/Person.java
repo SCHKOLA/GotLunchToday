@@ -24,6 +24,7 @@
 
 package de.schkola.kitchenscanner.util;
 
+import android.util.Log;
 import android.util.SparseArray;
 
 import java.io.BufferedReader;
@@ -122,6 +123,7 @@ public class Person {
     }
 
     public void gotLunch() {
+        Log.d("Person", "gotLunch called!");
         gotLunch = (byte) (getGotLunch() + 1);
         getLunchFile().delete();
         try {
@@ -131,7 +133,8 @@ public class Person {
             pw.flush();
             pw.close();
             fos.close();
-        } catch (IOException ignored) {
+        } catch (IOException ex) {
+            Log.e("Person", "Exception gotLunch", ex);
         }
     }
 
