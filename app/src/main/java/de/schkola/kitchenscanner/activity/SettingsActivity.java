@@ -30,7 +30,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,6 +39,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import androidx.appcompat.app.AppCompatActivity;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.task.JsonScanTask;
 import de.schkola.kitchenscanner.util.Person;

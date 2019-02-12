@@ -26,8 +26,6 @@ package de.schkola.kitchenscanner.activity;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ExpandableListView;
@@ -35,6 +33,8 @@ import android.widget.TextView;
 
 import org.json.JSONException;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.task.StatTask;
 import de.schkola.kitchenscanner.util.FragmentMgr;

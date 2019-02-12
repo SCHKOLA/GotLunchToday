@@ -27,14 +27,15 @@ package de.schkola.kitchenscanner.activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.io.IOException;
 
+import androidx.appcompat.app.AppCompatActivity;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.util.JsonAllergyParser;
 import de.schkola.kitchenscanner.util.JsonDayParser;
