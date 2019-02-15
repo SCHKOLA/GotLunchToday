@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class JsonScanTask extends AsyncTask<InputStream, Void, Boolean> {
 
@@ -68,7 +69,7 @@ public class JsonScanTask extends AsyncTask<InputStream, Void, Boolean> {
 
             CSVParser csvParser = CSVParser.parse(inputStreams[0], Charset.forName("ISO-8859-1"), format);
             File json = new File(jsonFolder, allergy ? "allergy.json" : "day.json");
-            JsonWriter writer = new JsonWriter(new OutputStreamWriter(new FileOutputStream(json), "ISO-8859-1"));
+            JsonWriter writer = new JsonWriter(new OutputStreamWriter(new FileOutputStream(json), StandardCharsets.ISO_8859_1));
             if (allergy) {
                 scanAllergy(csvParser, writer);
             } else {

@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 public class JsonDayParser {
 
@@ -43,7 +44,7 @@ public class JsonDayParser {
 
     public void parse() throws IOException {
         FileInputStream is = new FileInputStream(jsonPath.getAbsoluteFile());
-        try (JsonReader reader = new JsonReader(new InputStreamReader(is, "ISO-8859-1"))) {
+        try (JsonReader reader = new JsonReader(new InputStreamReader(is, StandardCharsets.ISO_8859_1))) {
             readArray(reader);
         }
     }
