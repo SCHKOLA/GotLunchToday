@@ -111,8 +111,8 @@ public class SettingsActivity extends AppCompatActivity {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("*/*");
-        String[] mimetypes = {"text/csv", "text/comma-separated-values"};
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
+        String[] mimeTypes = {"text/csv", "text/comma-separated-values"};
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         startActivityForResult(intent, allergy ? REQUEST_CODE_ALLERGY : REQUEST_CODE_DAY);
     }
 
@@ -137,6 +137,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        super.onActivityResult(requestCode, resultCode, resultData);
         if (resultData != null && resultCode == Activity.RESULT_OK) {
             Uri data = resultData.getData();
             if (data != null) {
