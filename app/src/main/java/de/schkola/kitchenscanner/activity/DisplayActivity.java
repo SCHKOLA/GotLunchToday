@@ -24,6 +24,7 @@
 
 package de.schkola.kitchenscanner.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.camera2.CameraAccessException;
@@ -74,16 +75,22 @@ public class DisplayActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        try {
-            IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-            if (scanResult != null && scanResult.getContents() != null) {
-                fillInformation(Person.getByXBA(Integer.parseInt(scanResult.getContents())));
-                s.schedule(this::startScan, getSleepTimeMillis(), TimeUnit.MILLISECONDS);
-            } else {
-                super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == IntentIntegrator.REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                try {
+                    IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+                    if (scanResult != null && scanResult.getContents() != null) {
+                        fillInformation(Person.getByXBA(Integer.parseInt(scanResult.getContents())));
+                        s.schedule(this::startScan, getSleepTimeMillis(), TimeUnit.MILLISECONDS);
+                    }
+                } catch (Exception ex) {
+                    Log.e("DisplayActivity", "Exception onActivityResult", ex);
+                }
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                finish();
             }
-        } catch (Exception ex) {
-            Log.e("DisplayActivity", "Exception onActivityResult", ex);
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -159,6 +166,9 @@ public class DisplayActivity extends AppCompatActivity {
 
         @Override
         public void onTorchModeChanged(@NonNull String cameraId, boolean enabled) {
+            if (s.isShutdown()) {
+                return;
+            }
             if (cameraId.equals("0") && enabled) {
                 s.schedule(() -> {
                     try {
