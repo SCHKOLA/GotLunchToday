@@ -28,6 +28,8 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.SparseArray;
 
+import androidx.core.util.Consumer;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,15 +37,14 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import de.schkola.kitchenscanner.util.Callback;
 import de.schkola.kitchenscanner.util.Person;
 
 public class StatTask extends AsyncTask<Void, Void, JSONObject> {
 
     private final ProgressDialog dialog;
-    private final Callback<JSONObject> runnable;
+    private final Consumer<JSONObject> runnable;
 
-    public StatTask(ProgressDialog dialog, Callback<JSONObject> runnable) {
+    public StatTask(ProgressDialog dialog, Consumer<JSONObject> runnable) {
         this.runnable = runnable;
         this.dialog = dialog;
     }
@@ -118,6 +119,6 @@ public class StatTask extends AsyncTask<Void, Void, JSONObject> {
     protected void onPostExecute(JSONObject jsonObject) {
         dialog.dismiss();
         dialog.cancel();
-        runnable.run(jsonObject);
+        runnable.accept(jsonObject);
     }
 }
