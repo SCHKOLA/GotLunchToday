@@ -24,82 +24,19 @@
 
 package de.schkola.kitchenscanner.activity;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.ExpandableListView;
-import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
 import de.schkola.kitchenscanner.R;
-import de.schkola.kitchenscanner.task.StatTask;
-import de.schkola.kitchenscanner.util.FragmentMgr;
-import de.schkola.kitchenscanner.util.LunchListAdapter;
+import de.schkola.kitchenscanner.fragment.StatsChartFragment;
 
 public class StatsActivity extends AppCompatActivity {
-
-    private ProgressDialog dialog;
-    private Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stats);
-        dialog = new ProgressDialog(this);
-        dialog.setCancelable(false);
-        dialog.setTitle(getString(R.string.collecting_data));
-        dialog.setMessage(getString(R.string.collecting_data_lunch));
-        setContent(R.layout.content_stats_overview);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_stats, menu);
-        this.menu = menu;
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_list:
-                setContent(R.layout.content_stats_list);
-                item.setVisible(false);
-                menu.findItem(R.id.action_chart).setVisible(true);
-                return true;
-            case R.id.action_chart:
-                setContent(R.layout.content_stats_overview);
-                item.setVisible(false);
-                menu.findItem(R.id.action_list).setVisible(true);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void setContent(int layout) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.container, FragmentMgr.newInstance(layout)).commit();
-        switch (layout) {
-            case R.layout.content_stats_overview:
-                new StatTask(dialog, (result) -> {
-                    ((TextView) findViewById(R.id.orderedA)).setText(result.getLunchA());
-                    ((TextView) findViewById(R.id.gotA)).setText(result.getDispensedA());
-                    ((TextView) findViewById(R.id.getA)).setText(result.getToDispenseA().size());
-                    ((TextView) findViewById(R.id.orderedB)).setText(result.getLunchA());
-                    ((TextView) findViewById(R.id.gotB)).setText(result.getDispensedB());
-                    ((TextView) findViewById(R.id.getB)).setText(result.getToDispenseB().size());
-                    ((TextView) findViewById(R.id.orderedS)).setText(result.getLunchS());
-                    ((TextView) findViewById(R.id.gotS)).setText(result.getDispensedS());
-                    ((TextView) findViewById(R.id.getS)).setText(result.getToDispenseS().size());
-                }).execute();
-                break;
-            case R.layout.content_stats_list:
-                new StatTask(dialog, (result) -> {
-                    ExpandableListView listView = findViewById(R.id.listview);
-                    listView.setAdapter(new LunchListAdapter(this, result.getToDispenseA(), result.getToDispenseB(), result.getToDispenseS()));
-                }).execute();
-                break;
-        }
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, new StatsChartFragment())
+                .commit();
     }
 }
