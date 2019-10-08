@@ -8,15 +8,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ExpandableListView;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.task.StatTask;
-import de.schkola.kitchenscanner.util.LunchListAdapter;
 
 public class StatsChartFragment extends Fragment {
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -31,20 +37,27 @@ public class StatsChartFragment extends Fragment {
         dialog.setTitle(getString(R.string.collecting_data));
         dialog.setMessage(getString(R.string.collecting_data_lunch));
         new StatTask(dialog, (result) -> {
-            ExpandableListView listView = view.findViewById(R.id.listview);
-            listView.setAdapter(new LunchListAdapter(getContext(), result.getToDispenseA(), result.getToDispenseB(), result.getToDispenseS()));
+            ((TextView) view.findViewById(R.id.orderedA)).setText(String.valueOf(result.getLunchA()));
+            ((TextView) view.findViewById(R.id.gotA)).setText(String.valueOf(result.getDispensedA()));
+            ((TextView) view.findViewById(R.id.getA)).setText(String.valueOf(result.getToDispenseA().size()));
+            ((TextView) view.findViewById(R.id.orderedB)).setText(String.valueOf(result.getLunchA()));
+            ((TextView) view.findViewById(R.id.gotB)).setText(String.valueOf(result.getDispensedB()));
+            ((TextView) view.findViewById(R.id.getB)).setText(String.valueOf(result.getToDispenseB().size()));
+            ((TextView) view.findViewById(R.id.orderedS)).setText(String.valueOf(result.getLunchS()));
+            ((TextView) view.findViewById(R.id.gotS)).setText(String.valueOf(result.getDispensedS()));
+            ((TextView) view.findViewById(R.id.getS)).setText(String.valueOf(result.getToDispenseS().size()));
         }).execute();
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_stats_list, menu);
+        inflater.inflate(R.menu.menu_stats_chart, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_chart) {
+        if (item.getItemId() == R.id.action_list) {
             getFragmentManager().beginTransaction()
                     .replace(R.id.container, new StatsListFragment())
                     .commit();

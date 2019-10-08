@@ -8,14 +8,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ExpandableListView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.task.StatTask;
+import de.schkola.kitchenscanner.util.LunchListAdapter;
 
 public class StatsListFragment extends Fragment {
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Nullable
     @Override
@@ -31,15 +38,8 @@ public class StatsListFragment extends Fragment {
         dialog.setTitle(getString(R.string.collecting_data));
         dialog.setMessage(getString(R.string.collecting_data_lunch));
         new StatTask(dialog, (result) -> {
-            ((TextView) view.findViewById(R.id.orderedA)).setText(result.getLunchA());
-            ((TextView) view.findViewById(R.id.gotA)).setText(result.getDispensedA());
-            ((TextView) view.findViewById(R.id.getA)).setText(result.getToDispenseA().size());
-            ((TextView) view.findViewById(R.id.orderedB)).setText(result.getLunchA());
-            ((TextView) view.findViewById(R.id.gotB)).setText(result.getDispensedB());
-            ((TextView) view.findViewById(R.id.getB)).setText(result.getToDispenseB().size());
-            ((TextView) view.findViewById(R.id.orderedS)).setText(result.getLunchS());
-            ((TextView) view.findViewById(R.id.gotS)).setText(result.getDispensedS());
-            ((TextView) view.findViewById(R.id.getS)).setText(result.getToDispenseS().size());
+            ExpandableListView listView = view.findViewById(R.id.listview);
+            listView.setAdapter(new LunchListAdapter(getContext(), result.getToDispenseA(), result.getToDispenseB(), result.getToDispenseS()));
         }).execute();
     }
 
