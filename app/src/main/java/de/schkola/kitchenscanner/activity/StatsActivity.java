@@ -36,7 +36,6 @@ import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.task.StatTask;
 import de.schkola.kitchenscanner.util.FragmentMgr;
 import de.schkola.kitchenscanner.util.LunchListAdapter;
-import org.json.JSONException;
 
 public class StatsActivity extends AppCompatActivity {
 
@@ -83,30 +82,22 @@ public class StatsActivity extends AppCompatActivity {
         fragmentManager.beginTransaction().replace(R.id.container, FragmentMgr.newInstance(layout)).commit();
         switch (layout) {
             case R.layout.content_stats_overview:
-                new StatTask(dialog, (jsonObject) -> {
-                    try {
-                        ((TextView) findViewById(R.id.orderedA)).setText(jsonObject.getString("lunchA"));
-                        ((TextView) findViewById(R.id.gotA)).setText(jsonObject.getString("gotLunchA"));
-                        ((TextView) findViewById(R.id.getA)).setText(String.valueOf(jsonObject.getInt("lunchA") - jsonObject.getInt("gotLunchA")));
-                        ((TextView) findViewById(R.id.orderedB)).setText(jsonObject.getString("lunchB"));
-                        ((TextView) findViewById(R.id.gotB)).setText(jsonObject.getString("gotLunchB"));
-                        ((TextView) findViewById(R.id.getB)).setText(String.valueOf(jsonObject.getInt("lunchB") - jsonObject.getInt("gotLunchB")));
-                        ((TextView) findViewById(R.id.orderedS)).setText(jsonObject.getString("lunchS"));
-                        ((TextView) findViewById(R.id.gotS)).setText(jsonObject.getString("gotLunchS"));
-                        ((TextView) findViewById(R.id.getS)).setText(String.valueOf(jsonObject.getInt("lunchS") - jsonObject.getInt("gotLunchS")));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                new StatTask(dialog, (result) -> {
+                    ((TextView) findViewById(R.id.orderedA)).setText(result.getLunchA());
+                    ((TextView) findViewById(R.id.gotA)).setText(result.getDispensedA());
+                    ((TextView) findViewById(R.id.getA)).setText(result.getToDispenseA().size());
+                    ((TextView) findViewById(R.id.orderedB)).setText(result.getLunchA());
+                    ((TextView) findViewById(R.id.gotB)).setText(result.getDispensedB());
+                    ((TextView) findViewById(R.id.getB)).setText(result.getToDispenseB().size());
+                    ((TextView) findViewById(R.id.orderedS)).setText(result.getLunchS());
+                    ((TextView) findViewById(R.id.gotS)).setText(result.getDispensedS());
+                    ((TextView) findViewById(R.id.getS)).setText(result.getToDispenseS().size());
                 }).execute();
                 break;
             case R.layout.content_stats_list:
-                new StatTask(dialog, (jsonObject) -> {
-                    try {
-                        ExpandableListView listView = findViewById(R.id.listview);
-                        listView.setAdapter(new LunchListAdapter(this, jsonObject.getJSONArray("getLunchA"), jsonObject.getJSONArray("getLunchB"), jsonObject.getJSONArray("getLunchS")));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                new StatTask(dialog, (result) -> {
+                    ExpandableListView listView = findViewById(R.id.listview);
+                    listView.setAdapter(new LunchListAdapter(this, result.getToDispenseA(), result.getToDispenseB(), result.getToDispenseS()));
                 }).execute();
                 break;
         }

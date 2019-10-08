@@ -29,18 +29,16 @@ import android.os.AsyncTask;
 import android.util.SparseArray;
 import androidx.core.util.Consumer;
 import de.schkola.kitchenscanner.util.Person;
+import de.schkola.kitchenscanner.util.StatsResult;
 import java.util.ArrayList;
 import java.util.Collections;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-public class StatTask extends AsyncTask<Void, Void, JSONObject> {
+public class StatTask extends AsyncTask<Void, Void, StatsResult> {
 
     private final ProgressDialog dialog;
-    private final Consumer<JSONObject> runnable;
+    private final Consumer<StatsResult> runnable;
 
-    public StatTask(ProgressDialog dialog, Consumer<JSONObject> runnable) {
+    public StatTask(ProgressDialog dialog, Consumer<StatsResult> runnable) {
         this.runnable = runnable;
         this.dialog = dialog;
     }
@@ -51,7 +49,7 @@ public class StatTask extends AsyncTask<Void, Void, JSONObject> {
     }
 
     @Override
-    protected JSONObject doInBackground(Void... params) {
+    protected StatsResult doInBackground(Void... params) {
         int lunchA = 0;
         int lunchB = 0;
         int lunchS = 0;
@@ -91,28 +89,24 @@ public class StatTask extends AsyncTask<Void, Void, JSONObject> {
                     break;
             }
         }
-        JSONObject jsonObject = new JSONObject();
         Collections.sort(getLunchA);
         Collections.sort(getLunchB);
         Collections.sort(getLunchS);
-        try {
-            jsonObject.put("lunchA", lunchA);
-            jsonObject.put("lunchB", lunchB);
-            jsonObject.put("lunchS", lunchS);
-            jsonObject.put("gotLunchA", gotLunchA);
-            jsonObject.put("gotLunchB", gotLunchB);
-            jsonObject.put("gotLunchS", gotLunchS);
-            jsonObject.put("getLunchA", new JSONArray(getLunchA));
-            jsonObject.put("getLunchB", new JSONArray(getLunchB));
-            jsonObject.put("getLunchS", new JSONArray(getLunchS));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
+        StatsResult result = new StatsResult();
+        result.setLunchA(lunchA);
+        result.setLunchB(lunchB);
+        result.setLunchS(lunchS);
+        result.setDispensedA(gotLunchA);
+        result.setDispensedB(gotLunchB);
+        result.setDispensedS(gotLunchS);
+        result.setToDispenseA(getLunchA);
+        result.setToDispenseB(getLunchB);
+        result.setToDispenseS(getLunchS);
+        return result;
     }
 
     @Override
-    protected void onPostExecute(JSONObject jsonObject) {
+    protected void onPostExecute(StatsResult jsonObject) {
         dialog.dismiss();
         dialog.cancel();
         runnable.accept(jsonObject);

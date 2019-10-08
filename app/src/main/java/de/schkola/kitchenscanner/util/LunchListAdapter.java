@@ -8,17 +8,16 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 import de.schkola.kitchenscanner.R;
-import org.json.JSONArray;
-import org.json.JSONException;
+import java.util.ArrayList;
 
 public class LunchListAdapter extends BaseExpandableListAdapter {
 
     private final Context context;
-    private final JSONArray getLunchA;
-    private final JSONArray getLunchB;
-    private final JSONArray getLunchS;
+    private final ArrayList<String> getLunchA;
+    private final ArrayList<String> getLunchB;
+    private final ArrayList<String> getLunchS;
 
-    public LunchListAdapter(Context context, JSONArray getLunchA, JSONArray getLunchB, JSONArray getLunchS) {
+    public LunchListAdapter(Context context, ArrayList<String> getLunchA, ArrayList<String> getLunchB, ArrayList<String> getLunchS) {
         this.context = context;
         this.getLunchA = getLunchA;
         this.getLunchB = getLunchB;
@@ -27,13 +26,8 @@ public class LunchListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        try {
-            JSONArray jsonArray = (JSONArray) getGroup(groupPosition);
-            return jsonArray == null ? null : jsonArray.getString(childPosition);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
+        ArrayList<String> arrayList = getGroup(groupPosition);
+        return arrayList == null ? null : arrayList.get(childPosition);
     }
 
     @Override
@@ -55,12 +49,12 @@ public class LunchListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        JSONArray jsonArray = (JSONArray) getGroup(groupPosition);
-        return jsonArray != null ? jsonArray.length() : 0;
+        ArrayList<String> collection = getGroup(groupPosition);
+        return collection != null ? collection.size() : 0;
     }
 
     @Override
-    public Object getGroup(int groupPosition) {
+    public ArrayList<String> getGroup(int groupPosition) {
         switch (groupPosition) {
             case 0:
                 return getLunchA;
