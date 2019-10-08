@@ -33,20 +33,17 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.TextView;
-
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-
+import de.schkola.kitchenscanner.R;
+import de.schkola.kitchenscanner.util.Person;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import de.schkola.kitchenscanner.R;
-import de.schkola.kitchenscanner.util.Person;
 
 public class DisplayActivity extends AppCompatActivity {
 

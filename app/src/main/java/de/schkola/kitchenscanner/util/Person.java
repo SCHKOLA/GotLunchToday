@@ -26,7 +26,6 @@ package de.schkola.kitchenscanner.util;
 
 import android.util.Log;
 import android.util.SparseArray;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;

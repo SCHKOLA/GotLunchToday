@@ -34,15 +34,13 @@ import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-
 import androidx.appcompat.app.AppCompatActivity;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.task.JsonScanTask;
 import de.schkola.kitchenscanner.util.Person;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 public class SettingsActivity extends AppCompatActivity {
 

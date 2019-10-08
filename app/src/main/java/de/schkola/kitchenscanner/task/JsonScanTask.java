@@ -27,11 +27,6 @@ package de.schkola.kitchenscanner.task;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.JsonWriter;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,6 +34,9 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 public class JsonScanTask extends AsyncTask<InputStream, Void, Boolean> {
 

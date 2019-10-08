@@ -27,17 +27,13 @@ package de.schkola.kitchenscanner.task;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.SparseArray;
-
 import androidx.core.util.Consumer;
-
+import de.schkola.kitchenscanner.util.Person;
+import java.util.ArrayList;
+import java.util.Collections;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Collections;
-
-import de.schkola.kitchenscanner.util.Person;
 
 public class StatTask extends AsyncTask<Void, Void, JSONObject> {
 
@@ -66,7 +62,7 @@ public class StatTask extends AsyncTask<Void, Void, JSONObject> {
         ArrayList<String> getLunchB = new ArrayList<>();
         ArrayList<String> getLunchS = new ArrayList<>();
         SparseArray<Person> array = Person.getPersons();
-        for(int i = 0; i < array.size(); i++) {
+        for (int i = 0; i < array.size(); i++) {
             Person p = array.get(array.keyAt(i));
             switch (p.getRawLunch()) {
                 case 1:

@@ -7,11 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
-
+import de.schkola.kitchenscanner.R;
 import org.json.JSONArray;
 import org.json.JSONException;
-
-import de.schkola.kitchenscanner.R;
 
 public class LunchListAdapter extends BaseExpandableListAdapter {
 

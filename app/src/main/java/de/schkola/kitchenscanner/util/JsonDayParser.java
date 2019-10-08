@@ -25,7 +25,6 @@
 package de.schkola.kitchenscanner.util;
 
 import android.util.JsonReader;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

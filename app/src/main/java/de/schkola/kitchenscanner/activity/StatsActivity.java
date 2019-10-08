@@ -30,15 +30,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
-
-import org.json.JSONException;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.task.StatTask;
 import de.schkola.kitchenscanner.util.FragmentMgr;
 import de.schkola.kitchenscanner.util.LunchListAdapter;
+import org.json.JSONException;
 
 public class StatsActivity extends AppCompatActivity {
 
