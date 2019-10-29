@@ -30,15 +30,14 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import de.schkola.kitchenscanner.R;
-import de.schkola.kitchenscanner.task.JsonScanTask;
-import de.schkola.kitchenscanner.util.Person;
-import java.io.File;
+import de.schkola.kitchenscanner.database.DatabaseAccess;
+import de.schkola.kitchenscanner.task.CsvImportTask;
+import de.schkola.kitchenscanner.task.DatabaseClearTask;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -47,12 +46,15 @@ public class SettingsActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_DAY = 42;
     private static final int REQUEST_CODE_ALLERGY = 43;
 
+    private DatabaseAccess dbAccess;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Set Content
         setContentView(R.layout.activity_settings);
         getFragmentManager().beginTransaction().replace(R.id.content_frame, new SettingsFragment()).commit();
+        dbAccess = new DatabaseAccess(getApplicationContext());
     }
 
     @Override
@@ -115,22 +117,15 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void deleteFiles() {
-        for (File f : getDir("Lunch", MainActivity.MODE_PRIVATE).listFiles()) {
-            f.delete();
-        }
-        SparseArray<Person> array = Person.getPersons();
-        for (int j = 0; j < array.size(); j++) {
-            Person p = array.get(array.keyAt(j));
-            p.resetGotLunch();
-        }
+        new DatabaseClearTask(dbAccess.getDatabase()).execute();
     }
 
-    private JsonScanTask createScanTask(boolean allergy) {
+    private CsvImportTask createScanTask(boolean allergy) {
         ProgressDialog dialog = new ProgressDialog(this);
         dialog.setCancelable(false);
         dialog.setTitle(getString(R.string.csv_import));
         dialog.setMessage(getString(R.string.csv_import_ongoing));
-        return new JsonScanTask(dialog, getDir("JSON", Activity.MODE_PRIVATE), allergy);
+        return new CsvImportTask(dialog, dbAccess.getDatabase(), allergy);
     }
 
     @Override

@@ -38,8 +38,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import de.schkola.kitchenscanner.R;
-import de.schkola.kitchenscanner.util.Person;
+import de.schkola.kitchenscanner.database.Allergy;
+import de.schkola.kitchenscanner.database.Customer;
+import de.schkola.kitchenscanner.database.DatabaseAccess;
+import de.schkola.kitchenscanner.database.LunchDatabase;
+import de.schkola.kitchenscanner.task.CustomerUpdateTask;
+import de.schkola.kitchenscanner.task.DatabaseCustomerTask;
+import de.schkola.kitchenscanner.task.LunchResult;
+import de.schkola.kitchenscanner.util.AllergyUtil;
+import de.schkola.kitchenscanner.util.LunchUtil;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -51,6 +60,7 @@ public class DisplayActivity extends AppCompatActivity {
     private CameraManager manager;
     private AVCallback av;
     private TCallback t;
+    private LunchDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +78,7 @@ public class DisplayActivity extends AppCompatActivity {
         if (Objects.equals(intent.getAction(), Intent.ACTION_RUN)) {
             startScan();
         }
+        database = new DatabaseAccess(getApplicationContext()).getDatabase();
     }
 
     @Override
@@ -77,8 +88,10 @@ public class DisplayActivity extends AppCompatActivity {
                 try {
                     IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
                     if (scanResult != null && scanResult.getContents() != null) {
-                        fillInformation(Person.getByXBA(Integer.parseInt(scanResult.getContents())));
-                        s.schedule(this::startScan, getSleepTimeMillis(), TimeUnit.MILLISECONDS);
+                        new DatabaseCustomerTask(database, (c) -> {
+                            fillInformation(c);
+                            s.schedule(this::startScan, getSleepTimeMillis(), TimeUnit.MILLISECONDS);
+                        }).execute(Integer.parseInt(scanResult.getContents()));
                     }
                 } catch (Exception ex) {
                     Log.e("DisplayActivity", "Exception onActivityResult", ex);
@@ -105,22 +118,30 @@ public class DisplayActivity extends AppCompatActivity {
         super.finish();
     }
 
-    private void fillInformation(Person p) {
+    private void fillInformation(LunchResult result) {
+        Customer c = result.getCustomer();
+        List<Allergy> a = result.getAllergies();
         TextView name = findViewById(R.id.name);
         TextView clazz = findViewById(R.id.clazz);
         TextView lunch = findViewById(R.id.lunch);
         TextView gotToday = findViewById(R.id.gotToday);
         TextView allergies = findViewById(R.id.allergies);
-        if (p != null) {
-            p.gotLunch();
-            name.setText(p.getPersonName());
-            clazz.setText(p.getClazz());
-            lunch.setText(p.getLunch());
-            byte gotLunch = p.getGotLunch();
-            if (gotLunch > 1) {
-                gotToday.setText(String.format(getString(R.string.gotLunch), gotLunch));
+        if (c != null) {
+            c.gotLunch += 1;
+            name.setText(c.name);
+            if (!c.grade.equals("Mitarbeiter")) {
+                clazz.setText(String.format("%s. Klasse", c.grade));
+            } else {
+                clazz.setText(c.grade);
             }
-            allergies.setText(p.getAllergies());
+            lunch.setText(LunchUtil.getLunch(c.lunch));
+            if (c.gotLunch > 1) {
+                gotToday.setText(String.format(getString(R.string.gotLunch), c.gotLunch));
+            } else {
+                gotToday.setText("");
+            }
+            allergies.setText(AllergyUtil.getAllergies(a));
+            new CustomerUpdateTask(database).execute(c);
         } else {
             name.setText("");
             clazz.setText("");

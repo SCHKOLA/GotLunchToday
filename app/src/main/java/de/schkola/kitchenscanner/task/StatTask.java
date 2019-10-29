@@ -26,20 +26,23 @@ package de.schkola.kitchenscanner.task;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
-import android.util.SparseArray;
 import androidx.core.util.Consumer;
-import de.schkola.kitchenscanner.util.Person;
+import de.schkola.kitchenscanner.database.Customer;
+import de.schkola.kitchenscanner.database.LunchDatabase;
 import de.schkola.kitchenscanner.util.StatsResult;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class StatTask extends AsyncTask<Void, Void, StatsResult> {
 
     private final ProgressDialog dialog;
+    private final LunchDatabase database;
     private final Consumer<StatsResult> runnable;
 
-    public StatTask(ProgressDialog dialog, Consumer<StatsResult> runnable) {
+    public StatTask(ProgressDialog dialog, LunchDatabase database, Consumer<StatsResult> runnable) {
         this.runnable = runnable;
+        this.database = database;
         this.dialog = dialog;
     }
 
@@ -50,42 +53,26 @@ public class StatTask extends AsyncTask<Void, Void, StatsResult> {
 
     @Override
     protected StatsResult doInBackground(Void... params) {
-        int lunchA = 0;
-        int lunchB = 0;
-        int lunchS = 0;
-        int gotLunchA = 0;
-        int gotLunchB = 0;
-        int gotLunchS = 0;
+        int lunchA = database.lunchDao().getLunchCount(1);
+        int lunchB = database.lunchDao().getLunchCount(2);
+        int lunchS = database.lunchDao().getLunchCount(3);
+        int gotLunchA = database.lunchDao().getDispensedLunchCount(1);
+        int gotLunchB = database.lunchDao().getDispensedLunchCount(2);
+        int gotLunchS = database.lunchDao().getDispensedLunchCount(3);
         ArrayList<String> getLunchA = new ArrayList<>();
         ArrayList<String> getLunchB = new ArrayList<>();
         ArrayList<String> getLunchS = new ArrayList<>();
-        SparseArray<Person> array = Person.getPersons();
-        for (int i = 0; i < array.size(); i++) {
-            Person p = array.get(array.keyAt(i));
-            switch (p.getRawLunch()) {
+        List<Customer> array = database.lunchDao().getToDispenseLunch();
+        for (Customer c : array) {
+            switch (c.lunch) {
                 case 1:
-                    lunchA++;
-                    if (p.getGotLunch() > 0) {
-                        gotLunchA++;
-                    } else {
-                        getLunchA.add(p.getPersonName());
-                    }
+                    getLunchA.add(c.name);
                     break;
                 case 2:
-                    lunchB++;
-                    if (p.getGotLunch() > 0) {
-                        gotLunchB++;
-                    } else {
-                        getLunchB.add(p.getPersonName());
-                    }
+                    getLunchB.add(c.name);
                     break;
                 case 3:
-                    lunchS++;
-                    if (p.getGotLunch() > 0) {
-                        gotLunchS++;
-                    } else {
-                        getLunchS.add(p.getPersonName());
-                    }
+                    getLunchS.add(c.name);
                     break;
             }
         }

@@ -26,27 +26,26 @@ package de.schkola.kitchenscanner.task;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
-import android.util.JsonWriter;
-import java.io.File;
-import java.io.FileOutputStream;
+import de.schkola.kitchenscanner.database.Allergy;
+import de.schkola.kitchenscanner.database.Customer;
+import de.schkola.kitchenscanner.database.LunchDatabase;
+import de.schkola.kitchenscanner.util.LunchUtil;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-public class JsonScanTask extends AsyncTask<InputStream, Void, Boolean> {
+public class CsvImportTask extends AsyncTask<InputStream, Void, Boolean> {
 
     private final ProgressDialog dialog;
-    private final File jsonFolder;
+    private final LunchDatabase database;
     private final boolean allergy;
 
-    public JsonScanTask(ProgressDialog dialog, File jsonFolder, boolean allergy) {
+    public CsvImportTask(ProgressDialog dialog, LunchDatabase database, boolean allergy) {
         this.dialog = dialog;
-        this.jsonFolder = jsonFolder;
+        this.database = database;
         this.allergy = allergy;
     }
 
@@ -66,12 +65,11 @@ public class JsonScanTask extends AsyncTask<InputStream, Void, Boolean> {
             }
 
             CSVParser csvParser = CSVParser.parse(inputStreams[0], Charset.forName("ISO-8859-1"), format);
-            File json = new File(jsonFolder, allergy ? "allergy.json" : "day.json");
-            JsonWriter writer = new JsonWriter(new OutputStreamWriter(new FileOutputStream(json), StandardCharsets.ISO_8859_1));
             if (allergy) {
-                scanAllergy(csvParser, writer);
+                database.allergyDao().deleteAll();
+                scanAllergy(csvParser, database);
             } else {
-                scanDay(csvParser, writer);
+                scanDay(csvParser, database);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -90,39 +88,35 @@ public class JsonScanTask extends AsyncTask<InputStream, Void, Boolean> {
         dialog.cancel();
     }
 
-    private void scanDay(CSVParser csvParser, JsonWriter writer) {
+    private void scanDay(CSVParser csvParser, LunchDatabase database) {
         try {
-            writer.beginArray();
             for (CSVRecord record : csvParser) {
-                writer.beginObject();
-                writer.name("class").value(record.get("Klasse"));
-                writer.name("xba").value(Integer.parseInt(record.get("XBA")));
-                writer.name("name").value(record.get("Name"));
-                writer.name("lunch").value(record.get("Gericht"));
-                writer.endObject();
+                Customer customer = new Customer();
+                customer.grade = record.get("Klasse");
+                customer.xba = Integer.parseInt(record.get("XBA"));
+                customer.name = record.get("Name");
+                customer.lunch = LunchUtil.getLunch(record.get("Gericht"));
+                database.customerDao().insertCustomer(customer);
             }
-            writer.endArray();
-            writer.close();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             throw new RuntimeException("Error in reading CSV file: " + ex);
         }
     }
 
-    private void scanAllergy(CSVParser csvParser, JsonWriter writer) {
+    private void scanAllergy(CSVParser csvParser, LunchDatabase database) {
         int xba = 0;
         int allergy = 1;
         try {
-            writer.beginArray();
             for (CSVRecord record : csvParser) {
-                writer.beginObject();
-                writer.name("xba").value(Integer.parseInt(record.get(xba)));
-                writer.name("allergy").value(record.get(allergy));
-                writer.endObject();
+                Allergy a = new Allergy();
+                a.xba = Integer.parseInt(record.get(xba));
+                a.allergy = record.get(allergy);
+                database.allergyDao().insertAllergy(a);
             }
-            writer.endArray();
-            writer.close();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             throw new RuntimeException("Error in reading CSV file: " + ex);
         }
     }
+
+
 }

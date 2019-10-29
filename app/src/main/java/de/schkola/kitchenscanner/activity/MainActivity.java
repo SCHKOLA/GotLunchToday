@@ -24,7 +24,6 @@
 
 package de.schkola.kitchenscanner.activity;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -32,59 +31,21 @@ import android.view.MenuItem;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import de.schkola.kitchenscanner.R;
-import de.schkola.kitchenscanner.util.JsonAllergyParser;
-import de.schkola.kitchenscanner.util.JsonDayParser;
-import java.io.File;
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
-
-    private static boolean loaded = false;
-
-    /**
-     * Loads data into the app cache
-     */
-    private boolean loadDataIntoApp() {
-        if (!loaded) {
-            try {
-                File jsonPath = new File(getDir("JSON", MODE_PRIVATE), "day.json");
-                File personPath = getDir("Lunch", MODE_PRIVATE);
-                new JsonDayParser(jsonPath, personPath).parse();
-            } catch (IOException e) {
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.error)
-                        .setMessage(R.string.no_file_found)
-                        .setPositiveButton(android.R.string.ok, null)
-                        .create().show();
-                return false;
-            }
-            try {
-                new JsonAllergyParser(new File(getDir("JSON", MODE_PRIVATE), "allergy.json")).parse();
-            } catch (IOException ignored) {
-            }
-            loaded = true;
-        }
-        return true;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        File lunch = this.getDir("Lunch", MODE_PRIVATE);
-        if (!lunch.exists()) {
-            lunch.mkdir();
-        }
         //Set Content
         setContentView(R.layout.activity_main);
 
         //Set Action Buttons
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
-            if (loadDataIntoApp()) {
-                Intent intent = new Intent(this, DisplayActivity.class);
-                intent.setAction(Intent.ACTION_RUN);
-                startActivity(intent);
-            }
+            Intent intent = new Intent(this, DisplayActivity.class);
+            intent.setAction(Intent.ACTION_RUN);
+            startActivity(intent);
         });
     }
 
@@ -102,9 +63,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             case R.id.action_stats:
-                if (loadDataIntoApp()) {
-                    startActivity(new Intent(this, StatsActivity.class));
-                }
+                startActivity(new Intent(this, StatsActivity.class));
             default:
                 return super.onOptionsItemSelected(item);
         }
