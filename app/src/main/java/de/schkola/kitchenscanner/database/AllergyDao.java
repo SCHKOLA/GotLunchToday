@@ -16,4 +16,7 @@ public interface AllergyDao {
 
     @Query("SELECT * FROM allergies WHERE xba = :xba")
     List<Allergy> getAllergies(int xba);
+
+    @Query("DELETE FROM allergies")
+    void deleteAll();
 }

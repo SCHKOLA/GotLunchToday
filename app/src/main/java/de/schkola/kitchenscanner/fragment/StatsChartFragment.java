@@ -41,7 +41,7 @@ public class StatsChartFragment extends Fragment {
             ((TextView) view.findViewById(R.id.orderedA)).setText(String.valueOf(result.getLunchA()));
             ((TextView) view.findViewById(R.id.gotA)).setText(String.valueOf(result.getDispensedA()));
             ((TextView) view.findViewById(R.id.getA)).setText(String.valueOf(result.getToDispenseA().size()));
-            ((TextView) view.findViewById(R.id.orderedB)).setText(String.valueOf(result.getLunchA()));
+            ((TextView) view.findViewById(R.id.orderedB)).setText(String.valueOf(result.getLunchB()));
             ((TextView) view.findViewById(R.id.gotB)).setText(String.valueOf(result.getDispensedB()));
             ((TextView) view.findViewById(R.id.getB)).setText(String.valueOf(result.getToDispenseB().size()));
             ((TextView) view.findViewById(R.id.orderedS)).setText(String.valueOf(result.getLunchS()));

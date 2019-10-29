@@ -66,6 +66,7 @@ public class CsvImportTask extends AsyncTask<InputStream, Void, Boolean> {
 
             CSVParser csvParser = CSVParser.parse(inputStreams[0], Charset.forName("ISO-8859-1"), format);
             if (allergy) {
+                database.allergyDao().deleteAll();
                 scanAllergy(csvParser, database);
             } else {
                 scanDay(csvParser, database);

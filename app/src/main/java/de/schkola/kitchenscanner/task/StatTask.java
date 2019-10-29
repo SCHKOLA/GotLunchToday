@@ -64,7 +64,7 @@ public class StatTask extends AsyncTask<Void, Void, StatsResult> {
         ArrayList<String> getLunchS = new ArrayList<>();
         List<Customer> array = database.lunchDao().getToDispenseLunch();
         for (Customer c : array) {
-            switch (c.gotLunch) {
+            switch (c.lunch) {
                 case 1:
                     getLunchA.add(c.name);
                     break;

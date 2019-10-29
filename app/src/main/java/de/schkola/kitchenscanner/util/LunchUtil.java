@@ -4,11 +4,11 @@ public class LunchUtil {
 
     public static byte getLunch(String lunch) {
         switch (lunch) {
-            case "A":
+            case "1":
                 return 1;
-            case "B":
+            case "2":
                 return 2;
-            case "S":
+            case "3":
                 return 3;
             default:
                 return 0;

@@ -31,17 +31,12 @@ import android.view.MenuItem;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import de.schkola.kitchenscanner.R;
-import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        File lunch = this.getDir("LunchUtil", MODE_PRIVATE);
-        if (!lunch.exists()) {
-            lunch.mkdir();
-        }
         //Set Content
         setContentView(R.layout.activity_main);
 

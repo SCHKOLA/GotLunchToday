@@ -37,6 +37,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.database.DatabaseAccess;
 import de.schkola.kitchenscanner.task.CsvImportTask;
+import de.schkola.kitchenscanner.task.DatabaseClearTask;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -116,7 +117,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void deleteFiles() {
-        dbAccess.getDatabase().customerDao().deleteAll();
+        new DatabaseClearTask(dbAccess.getDatabase()).execute();
     }
 
     private CsvImportTask createScanTask(boolean allergy) {
