@@ -38,7 +38,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import de.schkola.kitchenscanner.R;
-import de.schkola.kitchenscanner.util.Person;
+import de.schkola.kitchenscanner.database.Customer;
+import de.schkola.kitchenscanner.database.DatabaseAccess;
+import de.schkola.kitchenscanner.database.LunchDatabase;
+import de.schkola.kitchenscanner.util.AllergyUtil;
+import de.schkola.kitchenscanner.util.LunchUtil;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.Executors;
@@ -51,6 +55,7 @@ public class DisplayActivity extends AppCompatActivity {
     private CameraManager manager;
     private AVCallback av;
     private TCallback t;
+    private LunchDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +73,7 @@ public class DisplayActivity extends AppCompatActivity {
         if (Objects.equals(intent.getAction(), Intent.ACTION_RUN)) {
             startScan();
         }
+        database = new DatabaseAccess(getApplicationContext()).getDatabase();
     }
 
     @Override
@@ -77,7 +83,7 @@ public class DisplayActivity extends AppCompatActivity {
                 try {
                     IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
                     if (scanResult != null && scanResult.getContents() != null) {
-                        fillInformation(Person.getByXBA(Integer.parseInt(scanResult.getContents())));
+                        fillInformation(database.customerDao().getCustomer(Integer.parseInt(scanResult.getContents())));
                         s.schedule(this::startScan, getSleepTimeMillis(), TimeUnit.MILLISECONDS);
                     }
                 } catch (Exception ex) {
@@ -105,22 +111,21 @@ public class DisplayActivity extends AppCompatActivity {
         super.finish();
     }
 
-    private void fillInformation(Person p) {
+    private void fillInformation(Customer c) {
         TextView name = findViewById(R.id.name);
         TextView clazz = findViewById(R.id.clazz);
         TextView lunch = findViewById(R.id.lunch);
         TextView gotToday = findViewById(R.id.gotToday);
         TextView allergies = findViewById(R.id.allergies);
-        if (p != null) {
-            p.gotLunch();
-            name.setText(p.getPersonName());
-            clazz.setText(p.getClazz());
-            lunch.setText(p.getLunch());
-            byte gotLunch = p.getGotLunch();
-            if (gotLunch > 1) {
-                gotToday.setText(String.format(getString(R.string.gotLunch), gotLunch));
+        if (c != null) {
+            c.gotLunch += 1;
+            name.setText(c.name);
+            clazz.setText(c.grade);
+            lunch.setText(LunchUtil.getLunch(c.lunch));
+            if (c.gotLunch > 1) {
+                gotToday.setText(String.format(getString(R.string.gotLunch), c.gotLunch));
             }
-            allergies.setText(p.getAllergies());
+            allergies.setText(AllergyUtil.getAllergies(database.allergyDao().getAllergies(c.xba)));
         } else {
             name.setText("");
             clazz.setText("");

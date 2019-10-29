@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import de.schkola.kitchenscanner.R;
+import de.schkola.kitchenscanner.database.DatabaseAccess;
 import de.schkola.kitchenscanner.task.StatTask;
 import de.schkola.kitchenscanner.util.LunchListAdapter;
 
@@ -37,7 +38,7 @@ public class StatsListFragment extends Fragment {
         dialog.setCancelable(false);
         dialog.setTitle(getString(R.string.collecting_data));
         dialog.setMessage(getString(R.string.collecting_data_lunch));
-        new StatTask(dialog, (result) -> {
+        new StatTask(dialog, (new DatabaseAccess(getContext())).getDatabase(), (result) -> {
             ExpandableListView listView = view.findViewById(R.id.listview);
             listView.setAdapter(new LunchListAdapter(getContext(), result.getToDispenseA(), result.getToDispenseB(), result.getToDispenseS()));
         }).execute();
