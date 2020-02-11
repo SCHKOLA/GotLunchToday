@@ -5,6 +5,7 @@ import androidx.core.util.Consumer;
 import de.schkola.kitchenscanner.database.Allergy;
 import de.schkola.kitchenscanner.database.Customer;
 import de.schkola.kitchenscanner.database.LunchDatabase;
+import de.schkola.kitchenscanner.util.LunchResult;
 import java.util.List;
 
 public class DatabaseCustomerTask extends AsyncTask<Integer, Void, LunchResult> {

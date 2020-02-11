@@ -44,7 +44,7 @@ import de.schkola.kitchenscanner.database.DatabaseAccess;
 import de.schkola.kitchenscanner.database.LunchDatabase;
 import de.schkola.kitchenscanner.task.CustomerUpdateTask;
 import de.schkola.kitchenscanner.task.DatabaseCustomerTask;
-import de.schkola.kitchenscanner.task.LunchResult;
+import de.schkola.kitchenscanner.util.LunchResult;
 import de.schkola.kitchenscanner.util.AllergyUtil;
 import de.schkola.kitchenscanner.util.LunchUtil;
 import java.util.Collections;

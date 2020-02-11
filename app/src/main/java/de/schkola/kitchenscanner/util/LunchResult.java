@@ -1,4 +1,4 @@
-package de.schkola.kitchenscanner.task;
+package de.schkola.kitchenscanner.util;
 
 import de.schkola.kitchenscanner.database.Allergy;
 import de.schkola.kitchenscanner.database.Customer;
