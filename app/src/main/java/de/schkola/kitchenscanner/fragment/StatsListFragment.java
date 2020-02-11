@@ -53,7 +53,7 @@ public class StatsListFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_chart) {
-            getFragmentManager().beginTransaction()
+            getParentFragmentManager().beginTransaction()
                     .replace(R.id.container, new StatsChartFragment())
                     .commit();
             return true;

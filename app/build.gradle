@@ -19,7 +19,7 @@ android {
 dependencies {
     runtimeOnly fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.fragment:fragment:1.1.0'
+    implementation 'androidx.fragment:fragment:1.2.0'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'com.journeyapps:zxing-android-embedded:4.0.2'
     implementation 'org.apache.commons:commons-csv:1.7'
