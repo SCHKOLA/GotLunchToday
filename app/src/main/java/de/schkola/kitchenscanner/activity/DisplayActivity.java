@@ -27,13 +27,16 @@ package de.schkola.kitchenscanner.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Camera;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -57,6 +60,7 @@ import java.util.concurrent.TimeUnit;
 public class DisplayActivity extends AppCompatActivity {
 
     private ScheduledExecutorService s;
+    private Camera camera;
     private CameraManager manager;
     private AVCallback av;
     private TCallback t;
@@ -68,13 +72,15 @@ public class DisplayActivity extends AppCompatActivity {
         setContentView(R.layout.activity_display);
         Intent intent = getIntent();
         s = Executors.newScheduledThreadPool(2);
-        while (manager == null) {
-            manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            while (manager == null) {
+                manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+            }
+            av = new AVCallback();
+            t = new TCallback();
+            manager.registerAvailabilityCallback(av, null);
+            manager.registerTorchCallback(t, null);
         }
-        av = new AVCallback();
-        t = new TCallback();
-        manager.registerAvailabilityCallback(av, null);
-        manager.registerTorchCallback(t, null);
         if (Objects.equals(intent.getAction(), Intent.ACTION_RUN)) {
             startScan();
         }
@@ -89,6 +95,7 @@ public class DisplayActivity extends AppCompatActivity {
                     IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
                     if (scanResult != null && scanResult.getContents() != null) {
                         new DatabaseCustomerTask(database, (c) -> {
+                            startFlashLight();
                             fillInformation(c);
                             s.schedule(this::startScan, getSleepTimeMillis(), TimeUnit.MILLISECONDS);
                         }).execute(Integer.parseInt(scanResult.getContents()));
@@ -109,11 +116,15 @@ public class DisplayActivity extends AppCompatActivity {
         //Shutdown ExecutorService
         s.shutdownNow();
         //Reset torch mode
-        manager.unregisterAvailabilityCallback(av);
-        manager.unregisterTorchCallback(t);
-        try {
-            manager.setTorchMode("0", false);
-        } catch (CameraAccessException ignored) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            setFlashLight(false);
+        } else {
+            manager.unregisterAvailabilityCallback(av);
+            manager.unregisterTorchCallback(t);
+            try {
+                manager.setTorchMode("0", false);
+            } catch (CameraAccessException ignored) {
+            }
         }
         super.finish();
     }
@@ -166,6 +177,40 @@ public class DisplayActivity extends AppCompatActivity {
         integrator.initiateScan(Collections.singletonList("QR_CODE"));
     }
 
+    private void startFlashLight() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            setFlashLight(true);
+            s.schedule(() -> setFlashLight(false), 150, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    private void setFlashLight(boolean b) {
+        if (camera == null) {
+            try {
+                camera = Camera.open();
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }
+        }
+        if (camera != null) {
+            Camera.Parameters p = camera.getParameters();
+            if (b) {
+                // Turn on
+                p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                camera.setParameters(p);
+                camera.startPreview();
+            } else {
+                // Turn off
+                p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                camera.setParameters(p);
+                camera.stopPreview();
+                camera.release();
+                camera = null;
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
     private class AVCallback extends CameraManager.AvailabilityCallback {
 
         @Override
@@ -180,6 +225,7 @@ public class DisplayActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private class TCallback extends CameraManager.TorchCallback {
 
         @Override
