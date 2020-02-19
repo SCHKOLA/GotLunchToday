@@ -5,7 +5,7 @@ android {
 
     defaultConfig {
         applicationId "de.schkola.kitchenscanner"
-        minSdkVersion 24
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 3
         versionName "1.2.0"
@@ -19,9 +19,11 @@ android {
 dependencies {
     runtimeOnly fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.journeyapps:zxing-android-embedded:4.0.2'
     implementation 'androidx.fragment:fragment:1.2.1'
     implementation 'com.google.android.material:material:1.1.0'
+    implementation('com.journeyapps:zxing-android-embedded:4.1.0') { transitive = false }
+    //noinspection GradleDependency
+    implementation 'com.google.zxing:core:3.3.0'
     implementation 'org.apache.commons:commons-csv:1.7'
     implementation "androidx.room:room-runtime:2.2.3"
     annotationProcessor "androidx.room:room-compiler:2.2.3"
