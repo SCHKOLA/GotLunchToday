@@ -111,7 +111,7 @@ public class SettingsActivity extends AppCompatActivity {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("*/*");
-        String[] mimeTypes = {"text/csv", "text/comma-separated-values"};
+        String[] mimeTypes = {"text/csv", "text/comma-separated-values", "application/octet-stream"};
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         startActivityForResult(intent, allergy ? REQUEST_CODE_ALLERGY : REQUEST_CODE_DAY);
     }
@@ -125,7 +125,7 @@ public class SettingsActivity extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.setTitle(getString(R.string.csv_import));
         dialog.setMessage(getString(R.string.csv_import_ongoing));
-        return new CsvImportTask(dialog, dbAccess.getDatabase(), allergy);
+        return new CsvImportTask(dialog, this, dbAccess.getDatabase(), allergy);
     }
 
     @Override

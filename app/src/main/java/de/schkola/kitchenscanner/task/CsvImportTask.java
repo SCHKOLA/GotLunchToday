@@ -24,7 +24,9 @@
 
 package de.schkola.kitchenscanner.task;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import de.schkola.kitchenscanner.database.Allergy;
 import de.schkola.kitchenscanner.database.Customer;
@@ -33,6 +35,9 @@ import de.schkola.kitchenscanner.util.LunchUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -42,10 +47,13 @@ public class CsvImportTask extends AsyncTask<InputStream, Void, Boolean> {
     private final ProgressDialog dialog;
     private final LunchDatabase database;
     private final boolean allergy;
+    private final Context context;
+    private final Set<String> duplicateXba = Collections.synchronizedSet(new LinkedHashSet<>());
 
-    public CsvImportTask(ProgressDialog dialog, LunchDatabase database, boolean allergy) {
+    public CsvImportTask(ProgressDialog dialog, Context c, LunchDatabase db, boolean allergy) {
         this.dialog = dialog;
-        this.database = database;
+        this.context = c;
+        this.database = db;
         this.allergy = allergy;
     }
 
@@ -61,7 +69,7 @@ public class CsvImportTask extends AsyncTask<InputStream, Void, Boolean> {
             if (!allergy) {
                 format = format.withDelimiter(';')
                         .withSkipHeaderRecord()
-                        .withHeader("WT", "KW", "Klasse", "XBA", "Name", "Gericht");
+                        .withHeader();
             }
 
             CSVParser csvParser = CSVParser.parse(inputStreams[0], Charset.forName("ISO-8859-1"), format);
@@ -86,6 +94,13 @@ public class CsvImportTask extends AsyncTask<InputStream, Void, Boolean> {
     protected void onPostExecute(Boolean aBoolean) {
         dialog.dismiss();
         dialog.cancel();
+        if (!duplicateXba.isEmpty()) {
+            new AlertDialog.Builder(context)
+                    .setTitle("Doppelte XBA gefunden!")
+                    .setItems(duplicateXba.toArray(new String[0]), null)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .create().show();
+        }
     }
 
     private void scanDay(CSVParser csvParser, LunchDatabase database) {
@@ -96,10 +111,15 @@ public class CsvImportTask extends AsyncTask<InputStream, Void, Boolean> {
                 customer.xba = Integer.parseInt(record.get("XBA"));
                 customer.name = record.get("Name");
                 customer.lunch = LunchUtil.getLunch(record.get("Gericht"));
+                Customer checkCustomer = database.customerDao().getCustomer(customer.xba);
+                if (checkCustomer != null) {
+                    duplicateXba.add(String.format("[%s]: %s", record.get("XBA"), record.get("Name")));
+                    continue;
+                }
                 database.customerDao().insertCustomer(customer);
             }
         } catch (Exception ex) {
-            throw new RuntimeException("Error in reading CSV file: " + ex);
+            throw new RuntimeException("Error in reading CSV file: ", ex);
         }
     }
 
