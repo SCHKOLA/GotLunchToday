@@ -34,7 +34,7 @@ import de.schkola.kitchenscanner.database.LunchDatabase;
 import de.schkola.kitchenscanner.util.LunchUtil;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -72,7 +72,7 @@ public class CsvImportTask extends AsyncTask<InputStream, Void, Boolean> {
                         .withHeader();
             }
 
-            CSVParser csvParser = CSVParser.parse(inputStreams[0], Charset.forName("ISO-8859-1"), format);
+            CSVParser csvParser = CSVParser.parse(inputStreams[0], StandardCharsets.ISO_8859_1, format);
             if (allergy) {
                 database.allergyDao().deleteAll();
                 scanAllergy(csvParser, database);

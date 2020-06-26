@@ -135,7 +135,7 @@ public class DisplayActivity extends AppCompatActivity {
     }
 
     private int getSleepTimeMillis() {
-        return Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(this).getString("rescan", "2")) * 1000;
+        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this).getString("rescan", "2")) * 1000;
     }
 
     /**
