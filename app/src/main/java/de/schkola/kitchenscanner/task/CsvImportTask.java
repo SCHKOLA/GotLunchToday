@@ -1,33 +1,5 @@
-/*
- * MIT License
- *
- * Copyright 2017 Niklas Merkelt
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package de.schkola.kitchenscanner.task;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.os.AsyncTask;
 import de.schkola.kitchenscanner.database.Allergy;
 import de.schkola.kitchenscanner.database.Customer;
 import de.schkola.kitchenscanner.database.LunchDatabase;
@@ -42,30 +14,26 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-public class CsvImportTask extends AsyncTask<InputStream, Void, Boolean> {
+public class CsvImportTask extends ProgressAsyncTask<InputStream, Void, Boolean> {
 
-    private final ProgressDialog dialog;
     private final LunchDatabase database;
     private final boolean allergy;
-    private final Context context;
     private final Set<String> duplicateXba = Collections.synchronizedSet(new LinkedHashSet<>());
+    private CsvImportTask.CsvImportListener cil;
 
-    public CsvImportTask(ProgressDialog dialog, Context c, LunchDatabase db, boolean allergy) {
-        this.dialog = dialog;
-        this.context = c;
+    public CsvImportTask(LunchDatabase db, boolean allergy) {
         this.database = db;
         this.allergy = allergy;
     }
 
-    @Override
-    protected void onPreExecute() {
-        dialog.show();
+    public void setCsvImportListener(CsvImportTask.CsvImportListener cil) {
+        this.cil = cil;
     }
 
     @Override
     protected Boolean doInBackground(InputStream... inputStreams) {
         try {
-            CSVFormat format = CSVFormat.DEFAULT;
+            CSVFormat format = CSVFormat.DEFAULT.withAllowMissingColumnNames();
             if (!allergy) {
                 format = format.withDelimiter(';')
                         .withSkipHeaderRecord()
@@ -91,15 +59,10 @@ public class CsvImportTask extends AsyncTask<InputStream, Void, Boolean> {
     }
 
     @Override
-    protected void onPostExecute(Boolean aBoolean) {
-        dialog.dismiss();
-        dialog.cancel();
-        if (!duplicateXba.isEmpty()) {
-            new AlertDialog.Builder(context)
-                    .setTitle("Doppelte XBA gefunden!")
-                    .setItems(duplicateXba.toArray(new String[0]), null)
-                    .setPositiveButton(android.R.string.ok, null)
-                    .create().show();
+    protected void onPostExecute(Boolean result) {
+        super.onPostExecute(result);
+        if (cil != null && !duplicateXba.isEmpty()) {
+            cil.onDuplicateXba(duplicateXba);
         }
     }
 
@@ -138,5 +101,7 @@ public class CsvImportTask extends AsyncTask<InputStream, Void, Boolean> {
         }
     }
 
-
+    public interface CsvImportListener {
+        void onDuplicateXba(Set<String> duplicateXba);
+    }
 }

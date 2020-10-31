@@ -38,6 +38,7 @@ import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.database.DatabaseAccess;
 import de.schkola.kitchenscanner.task.CsvImportTask;
 import de.schkola.kitchenscanner.task.DatabaseClearTask;
+import de.schkola.kitchenscanner.task.ProgressAsyncTask;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -125,7 +126,25 @@ public class SettingsActivity extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.setTitle(getString(R.string.csv_import));
         dialog.setMessage(getString(R.string.csv_import_ongoing));
-        return new CsvImportTask(dialog, this, dbAccess.getDatabase(), allergy);
+        CsvImportTask csvImportTask = new CsvImportTask(dbAccess.getDatabase(), allergy);
+        csvImportTask.setProgressListener(new ProgressAsyncTask.ProgressListener() {
+            @Override
+            public void onStart() {
+                dialog.show();
+            }
+
+            @Override
+            public void onFinished() {
+                dialog.dismiss();
+                dialog.cancel();
+            }
+        });
+        csvImportTask.setCsvImportListener(duplicateXba -> new AlertDialog.Builder(this)
+                .setTitle(R.string.duplicate_xba)
+                .setItems(duplicateXba.toArray(new String[0]), null)
+                .setPositiveButton(android.R.string.ok, null)
+                .create().show());
+        return csvImportTask;
     }
 
     @Override

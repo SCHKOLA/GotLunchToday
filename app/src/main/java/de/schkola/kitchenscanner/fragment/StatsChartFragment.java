@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.database.DatabaseAccess;
+import de.schkola.kitchenscanner.task.ProgressAsyncTask;
 import de.schkola.kitchenscanner.task.StatTask;
 
 public class StatsChartFragment extends Fragment {
@@ -37,7 +38,7 @@ public class StatsChartFragment extends Fragment {
         dialog.setCancelable(false);
         dialog.setTitle(getString(R.string.collecting_data));
         dialog.setMessage(getString(R.string.collecting_data_lunch));
-        new StatTask(dialog, (new DatabaseAccess(getContext())).getDatabase(), (result) -> {
+        StatTask statTask = new StatTask((new DatabaseAccess(getContext())).getDatabase(), result -> {
             ((TextView) view.findViewById(R.id.orderedA)).setText(String.valueOf(result.getLunchA()));
             ((TextView) view.findViewById(R.id.gotA)).setText(String.valueOf(result.getDispensedA()));
             ((TextView) view.findViewById(R.id.getA)).setText(String.valueOf(result.getToDispenseA().size()));
@@ -47,7 +48,20 @@ public class StatsChartFragment extends Fragment {
             ((TextView) view.findViewById(R.id.orderedS)).setText(String.valueOf(result.getLunchS()));
             ((TextView) view.findViewById(R.id.gotS)).setText(String.valueOf(result.getDispensedS()));
             ((TextView) view.findViewById(R.id.getS)).setText(String.valueOf(result.getToDispenseS().size()));
-        }).execute();
+        });
+        statTask.setProgressListener(new ProgressAsyncTask.ProgressListener() {
+            @Override
+            public void onStart() {
+                dialog.show();
+            }
+
+            @Override
+            public void onFinished() {
+                dialog.dismiss();
+                dialog.cancel();
+            }
+        });
+        statTask.execute();
     }
 
     @Override
