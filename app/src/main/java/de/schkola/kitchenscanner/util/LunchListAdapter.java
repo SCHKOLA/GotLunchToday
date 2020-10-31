@@ -8,16 +8,17 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 import de.schkola.kitchenscanner.R;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class LunchListAdapter extends BaseExpandableListAdapter {
 
     private final Context context;
-    private final ArrayList<String> getLunchA;
-    private final ArrayList<String> getLunchB;
-    private final ArrayList<String> getLunchS;
+    private final List<String> getLunchA;
+    private final List<String> getLunchB;
+    private final List<String> getLunchS;
 
-    public LunchListAdapter(Context context, ArrayList<String> getLunchA, ArrayList<String> getLunchB, ArrayList<String> getLunchS) {
+    public LunchListAdapter(Context context, List<String> getLunchA, List<String> getLunchB, List<String> getLunchS) {
         this.context = context;
         this.getLunchA = getLunchA;
         this.getLunchB = getLunchB;
@@ -26,7 +27,7 @@ public class LunchListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        ArrayList<String> arrayList = getGroup(groupPosition);
+        List<String> arrayList = getGroup(groupPosition);
         return arrayList == null ? null : arrayList.get(childPosition);
     }
 
@@ -49,12 +50,12 @@ public class LunchListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        ArrayList<String> collection = getGroup(groupPosition);
+        List<String> collection = getGroup(groupPosition);
         return collection != null ? collection.size() : 0;
     }
 
     @Override
-    public ArrayList<String> getGroup(int groupPosition) {
+    public List<String> getGroup(int groupPosition) {
         switch (groupPosition) {
             case 0:
                 return getLunchA;
@@ -63,7 +64,7 @@ public class LunchListAdapter extends BaseExpandableListAdapter {
             case 2:
                 return getLunchS;
             default:
-                return null;
+                return Collections.emptyList();
         }
     }
 

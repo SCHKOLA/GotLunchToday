@@ -1,6 +1,5 @@
 package de.schkola.kitchenscanner.util;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
@@ -20,7 +19,7 @@ public class TorchManager {
 
     public TorchManager(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            s = Executors.newScheduledThreadPool(1);
+            s = Executors.newSingleThreadScheduledExecutor();
             while (manager == null) {
                 manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
             }
@@ -47,7 +46,6 @@ public class TorchManager {
     @RequiresApi(Build.VERSION_CODES.M)
     private class AVCallback extends CameraManager.AvailabilityCallback {
 
-        @SuppressLint("MissingPermission")
         @Override
         public void onCameraAvailable(@NonNull String cameraId) {
             if (cameraId.equals("0")) {

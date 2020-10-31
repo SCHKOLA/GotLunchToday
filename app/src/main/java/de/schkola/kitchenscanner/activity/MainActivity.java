@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_stats:
                 startActivity(new Intent(this, StatsActivity.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

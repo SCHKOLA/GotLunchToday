@@ -24,8 +24,6 @@
 
 package de.schkola.kitchenscanner.task;
 
-import android.app.ProgressDialog;
-import android.os.AsyncTask;
 import androidx.core.util.Consumer;
 import de.schkola.kitchenscanner.database.Customer;
 import de.schkola.kitchenscanner.database.LunchDatabase;
@@ -34,21 +32,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class StatTask extends AsyncTask<Void, Void, StatsResult> {
+public class StatTask extends ProgressAsyncTask<Void, Void, StatsResult> {
 
-    private final ProgressDialog dialog;
     private final LunchDatabase database;
     private final Consumer<StatsResult> runnable;
 
-    public StatTask(ProgressDialog dialog, LunchDatabase database, Consumer<StatsResult> runnable) {
+    public StatTask(LunchDatabase database, Consumer<StatsResult> runnable) {
         this.runnable = runnable;
         this.database = database;
-        this.dialog = dialog;
-    }
-
-    @Override
-    protected void onPreExecute() {
-        this.dialog.show();
     }
 
     @Override
@@ -94,8 +85,7 @@ public class StatTask extends AsyncTask<Void, Void, StatsResult> {
 
     @Override
     protected void onPostExecute(StatsResult jsonObject) {
-        dialog.dismiss();
-        dialog.cancel();
+        super.onPostExecute(jsonObject);
         runnable.accept(jsonObject);
     }
 }

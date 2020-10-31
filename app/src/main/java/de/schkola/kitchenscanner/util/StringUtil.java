@@ -1,8 +1,11 @@
 package de.schkola.kitchenscanner.util;
 
-public class LunchUtil {
+import de.schkola.kitchenscanner.database.Allergy;
+import java.util.List;
 
-    public static byte getLunch(String lunch) {
+public interface StringUtil {
+
+    static byte getLunch(String lunch) {
         switch (lunch) {
             case "1":
                 return 1;
@@ -15,7 +18,7 @@ public class LunchUtil {
         }
     }
 
-    public static String getLunch(int lunch) {
+    static String getLunch(int lunch) {
         switch (lunch) {
             case 1:
                 return "A";
@@ -26,5 +29,13 @@ public class LunchUtil {
             default:
                 return "X";
         }
+    }
+
+    static String getAllergies(List<Allergy> allergies) {
+        StringBuilder s = new StringBuilder();
+        for (Allergy a : allergies) {
+            s.append(a.allergy).append(", ");
+        }
+        return s.toString();
     }
 }

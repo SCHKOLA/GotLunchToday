@@ -38,6 +38,7 @@ import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.database.DatabaseAccess;
 import de.schkola.kitchenscanner.task.CsvImportTask;
 import de.schkola.kitchenscanner.task.DatabaseClearTask;
+import de.schkola.kitchenscanner.task.ProgressAsyncTask;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -53,7 +54,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //Set Content
         setContentView(R.layout.activity_settings);
-        getFragmentManager().beginTransaction().replace(R.id.content_frame, new SettingsFragment()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new SettingsFragment()).commit();
         dbAccess = new DatabaseAccess(getApplicationContext());
     }
 
@@ -76,7 +77,7 @@ public class SettingsActivity extends AppCompatActivity {
                             startCopy(false);
                         })
                         .setNegativeButton(R.string.no, (dialog, witch) -> startCopy(false))
-                        .setNeutralButton(R.string.canel, null)
+                        .setNeutralButton(R.string.cancel, null)
                         .create().show();
                 return true;
             case R.id.action_CSV_copy_allergy:
@@ -125,7 +126,25 @@ public class SettingsActivity extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.setTitle(getString(R.string.csv_import));
         dialog.setMessage(getString(R.string.csv_import_ongoing));
-        return new CsvImportTask(dialog, this, dbAccess.getDatabase(), allergy);
+        CsvImportTask csvImportTask = new CsvImportTask(dbAccess.getDatabase(), allergy);
+        csvImportTask.setProgressListener(new ProgressAsyncTask.ProgressListener() {
+            @Override
+            public void onStart() {
+                dialog.show();
+            }
+
+            @Override
+            public void onFinished() {
+                dialog.dismiss();
+                dialog.cancel();
+            }
+        });
+        csvImportTask.setCsvImportListener(duplicateXba -> new AlertDialog.Builder(this)
+                .setTitle(R.string.duplicate_xba)
+                .setItems(duplicateXba.toArray(new String[0]), null)
+                .setPositiveButton(android.R.string.ok, null)
+                .create().show());
+        return csvImportTask;
     }
 
     @Override

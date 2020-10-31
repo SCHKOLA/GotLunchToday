@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_rescan_time_titles">
+        <item>1 Sekunde</item>
+        <item>2 Sekunden</item>
+        <item>3 Sekunden</item>
+        <item>4 Sekunden</item>
+        <item>5 Sekunden</item>
+    </string-array>
+    <string name="app_name">LunchScanner</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="choose_allergy">Bitte wähle die Allergiedatei aus!</string>
+    <string name="choose_day">Bitte wähle die Tagesdatei aus!</string>
+    <string name="collecting_data">Sammle Daten</string>
+    <string name="collecting_data_lunch">Sammle Statistik-Daten für den aktuellen Tag</string>
+    <string name="copy_request_allergy">Die alten Allergiedaten werden ersetzt!\nMöchten sie wirklich fortfahren?</string>
+    <string name="copy_request_day">Die alte Tagesdatei wird ersetzt!\nMöchten sie alte Essendaten löschen?</string>
+    <string name="settings">Einstellungen</string>
+    <string name="pref_title_rescan">Automatisches Neuscannen</string>
+    <string name="pref_title_rescan_time">Ergebnisanzeige</string>
+    <string name="csv_import_ongoing">CSV-Daten wird importiert…</string>
+    <string name="csv_import">CSV-Daten Import</string>
+    <string name="error">Fehler</string>
+    <string name="no_file_found">Es wurde keine CSV-Datei gefunden!</string>
+    <string name="csv_file_copy">CSV-Daten (Tag) importieren</string>
+    <string name="csv_file_copy_allergy">CSV-Daten (Allergie) importieren</string>
+    <string name="gotLunch">Kommt zum %d. mal</string>
+    <string name="delete_data">Daten löschen</string>
+    <string name="lunch_display">Essensanzeige</string>
+    <string name="start_text">Um die benötigte CSV-Datei zu importieren, müssen die Einstellungen mittels des Zahnrades geöffnet werden. Nun über die drei Punkte die Auswahltmöglichkeit \'CSV-Daten (Tag) importieren\' und die Frage mit OK beantworten. Durch ein betätigen dieser Taste wird der Import eingeleitet, wenn das importieren erfolgreich war kommt eine dementsprechende Meldung. Wenn die CSV-Datei importiert wurde, ist der Scanner bereit. Dazu einfach auf das Icon mit der Kamera drücken und schon öffnet sich der Scanner, nun kann eine Essenskarte gescannt werden. Um den Intervall der Scans einzustellen kann man wieder über das Zahnrad die Einstellungen öffnen. Wenn der Tag vorbei ist muss man die Daten wieder über das Zahnrad und die drei Punkte löschen.</string>
+    <string name="start_title">Scannerbenutzung</string>
+    <string name="delete">Löschen</string>
+    <string name="delete_request">Alle Essensdaten werden entfernt!\nMöchten sie wirklich fortfahren?</string>
+    <string name="stats">Statistiken</string>
+    <string name="ordered">Bestellt</string>
+    <string name="got">Ausgegeben</string>
+    <string name="get">Auszugegeben</string>
+    <string name="getLunchA">Auszugegebende Essen A</string>
+    <string name="getLunchB">Auszugegebende Essen B</string>
+    <string name="getLunchS">Auszugegebende Essen S</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="x_class">%s. Klasse</string>
+    <string name="duplicate_xba">Doppelte XBA gefunden!</string>
+</resources>

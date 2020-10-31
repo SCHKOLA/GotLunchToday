@@ -26,11 +26,14 @@ package de.schkola.kitchenscanner.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import de.schkola.kitchenscanner.R;
@@ -40,9 +43,8 @@ import de.schkola.kitchenscanner.database.DatabaseAccess;
 import de.schkola.kitchenscanner.database.LunchDatabase;
 import de.schkola.kitchenscanner.task.CustomerUpdateTask;
 import de.schkola.kitchenscanner.task.DatabaseCustomerTask;
-import de.schkola.kitchenscanner.util.AllergyUtil;
 import de.schkola.kitchenscanner.util.LunchResult;
-import de.schkola.kitchenscanner.util.LunchUtil;
+import de.schkola.kitchenscanner.util.StringUtil;
 import de.schkola.kitchenscanner.util.TorchManager;
 import java.util.Collections;
 import java.util.List;
@@ -62,7 +64,13 @@ public class DisplayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display);
         Intent intent = getIntent();
-        s = Executors.newScheduledThreadPool(1);
+        if (isRescanEnabled()) {
+            s = Executors.newSingleThreadScheduledExecutor();
+        } else {
+            FloatingActionButton fab = findViewById(R.id.fab);
+            fab.setVisibility(View.VISIBLE);
+            fab.setOnClickListener(view -> startScan());
+        }
         tm = new TorchManager(this);
         if (Objects.equals(intent.getAction(), Intent.ACTION_RUN)) {
             startScan();
@@ -77,9 +85,11 @@ public class DisplayActivity extends AppCompatActivity {
                 try {
                     IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
                     if (scanResult != null && scanResult.getContents() != null) {
-                        new DatabaseCustomerTask(database, (c) -> {
+                        new DatabaseCustomerTask(database, c -> {
                             fillInformation(c);
-                            s.schedule(this::startScan, getSleepTimeMillis(), TimeUnit.MILLISECONDS);
+                            if (isRescanEnabled()) {
+                                s.schedule(this::startScan, getRescanTime(), TimeUnit.SECONDS);
+                            }
                         }).execute(Integer.parseInt(scanResult.getContents()));
                     }
                 } catch (Exception ex) {
@@ -96,7 +106,9 @@ public class DisplayActivity extends AppCompatActivity {
     @Override
     public void finish() {
         //Shutdown ExecutorService
-        s.shutdownNow();
+        if (s != null) {
+            s.shutdownNow();
+        }
         tm.shutdown();
         super.finish();
     }
@@ -112,18 +124,18 @@ public class DisplayActivity extends AppCompatActivity {
         if (c != null) {
             c.gotLunch += 1;
             name.setText(c.name);
-            if (!c.grade.equals("Mitarbeiter")) {
-                clazz.setText(String.format("%s. Klasse", c.grade));
+            if (c.grade.matches("\\d+")) {
+                clazz.setText(getString(R.string.x_class, c.grade));
             } else {
                 clazz.setText(c.grade);
             }
-            lunch.setText(LunchUtil.getLunch(c.lunch));
+            lunch.setText(StringUtil.getLunch(c.lunch));
             if (c.gotLunch > 1) {
-                gotToday.setText(String.format(getString(R.string.gotLunch), c.gotLunch));
+                gotToday.setText(getString(R.string.gotLunch, c.gotLunch));
             } else {
                 gotToday.setText("");
             }
-            allergies.setText(AllergyUtil.getAllergies(a));
+            allergies.setText(StringUtil.getAllergies(a));
             new CustomerUpdateTask(database).execute(c);
         } else {
             name.setText("");
@@ -134,8 +146,23 @@ public class DisplayActivity extends AppCompatActivity {
         }
     }
 
-    private int getSleepTimeMillis() {
-        return Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(this).getString("rescan", "2")) * 1000;
+    private boolean isRescanEnabled() {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        if (pref != null) {
+            return pref.getBoolean("rescan_enabled", true);
+        }
+        return true;
+    }
+
+    private int getRescanTime() {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        if (pref != null) {
+            String rescan = pref.getString("rescan_time", "2");
+            if (rescan != null) {
+                return Integer.parseInt(rescan);
+            }
+        }
+        return 2;
     }
 
     /**
