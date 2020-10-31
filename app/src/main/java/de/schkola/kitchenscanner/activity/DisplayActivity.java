@@ -43,9 +43,8 @@ import de.schkola.kitchenscanner.database.DatabaseAccess;
 import de.schkola.kitchenscanner.database.LunchDatabase;
 import de.schkola.kitchenscanner.task.CustomerUpdateTask;
 import de.schkola.kitchenscanner.task.DatabaseCustomerTask;
-import de.schkola.kitchenscanner.util.AllergyUtil;
 import de.schkola.kitchenscanner.util.LunchResult;
-import de.schkola.kitchenscanner.util.LunchUtil;
+import de.schkola.kitchenscanner.util.StringUtil;
 import de.schkola.kitchenscanner.util.TorchManager;
 import java.util.Collections;
 import java.util.List;
@@ -123,18 +122,18 @@ public class DisplayActivity extends AppCompatActivity {
         if (c != null) {
             c.gotLunch += 1;
             name.setText(c.name);
-            if (!c.grade.equals("Mitarbeiter")) {
+            if (c.grade.matches("\\d+")) {
                 clazz.setText(getString(R.string.x_class, c.grade));
             } else {
                 clazz.setText(c.grade);
             }
-            lunch.setText(LunchUtil.getLunch(c.lunch));
+            lunch.setText(StringUtil.getLunch(c.lunch));
             if (c.gotLunch > 1) {
                 gotToday.setText(getString(R.string.gotLunch, c.gotLunch));
             } else {
                 gotToday.setText("");
             }
-            allergies.setText(AllergyUtil.getAllergies(a));
+            allergies.setText(StringUtil.getAllergies(a));
             new CustomerUpdateTask(database).execute(c);
         } else {
             name.setText("");

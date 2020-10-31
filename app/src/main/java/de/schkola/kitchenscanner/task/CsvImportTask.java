@@ -31,7 +31,7 @@ import android.os.AsyncTask;
 import de.schkola.kitchenscanner.database.Allergy;
 import de.schkola.kitchenscanner.database.Customer;
 import de.schkola.kitchenscanner.database.LunchDatabase;
-import de.schkola.kitchenscanner.util.LunchUtil;
+import de.schkola.kitchenscanner.util.StringUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -110,7 +110,7 @@ public class CsvImportTask extends AsyncTask<InputStream, Void, Boolean> {
                 customer.grade = record.get("Klasse");
                 customer.xba = Integer.parseInt(record.get("XBA"));
                 customer.name = record.get("Name");
-                customer.lunch = LunchUtil.getLunch(record.get("Gericht"));
+                customer.lunch = StringUtil.getLunch(record.get("Gericht"));
                 Customer checkCustomer = database.customerDao().getCustomer(customer.xba);
                 if (checkCustomer != null) {
                     duplicateXba.add(String.format("[%s]: %s", record.get("XBA"), record.get("Name")));
