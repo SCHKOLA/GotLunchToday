@@ -106,7 +106,9 @@ public class DisplayActivity extends AppCompatActivity {
     @Override
     public void finish() {
         //Shutdown ExecutorService
-        s.shutdownNow();
+        if (s != null) {
+            s.shutdownNow();
+        }
         tm.shutdown();
         super.finish();
     }

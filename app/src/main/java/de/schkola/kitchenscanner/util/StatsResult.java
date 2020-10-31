@@ -1,6 +1,6 @@
 package de.schkola.kitchenscanner.util;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class StatsResult {
 
@@ -10,9 +10,9 @@ public class StatsResult {
     private int dispensedA;
     private int dispensedB;
     private int dispensedS;
-    private ArrayList<String> toDispenseA;
-    private ArrayList<String> toDispenseB;
-    private ArrayList<String> toDispenseS;
+    private List<String> toDispenseA;
+    private List<String> toDispenseB;
+    private List<String> toDispenseS;
 
     public int getLunchA() {
         return lunchA;
@@ -38,27 +38,27 @@ public class StatsResult {
         this.lunchS = lunchS;
     }
 
-    public ArrayList<String> getToDispenseA() {
+    public List<String> getToDispenseA() {
         return toDispenseA;
     }
 
-    public void setToDispenseA(ArrayList<String> toDispenseA) {
+    public void setToDispenseA(List<String> toDispenseA) {
         this.toDispenseA = toDispenseA;
     }
 
-    public ArrayList<String> getToDispenseB() {
+    public List<String> getToDispenseB() {
         return toDispenseB;
     }
 
-    public void setToDispenseB(ArrayList<String> toDispenseB) {
+    public void setToDispenseB(List<String> toDispenseB) {
         this.toDispenseB = toDispenseB;
     }
 
-    public ArrayList<String> getToDispenseS() {
+    public List<String> getToDispenseS() {
         return toDispenseS;
     }
 
-    public void setToDispenseS(ArrayList<String> toDispenseS) {
+    public void setToDispenseS(List<String> toDispenseS) {
         this.toDispenseS = toDispenseS;
     }
 
