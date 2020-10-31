@@ -6,8 +6,12 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.0'
+        classpath 'com.android.tools.build:gradle:4.1.0'
     }
+}
+
+plugins {
+    id "org.sonarqube" version "3.0"
 }
 
 allprojects {
@@ -20,4 +24,12 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "LauncherGroup_GotLunchToday"
+        property "sonar.organization", "launchergroup"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
 }
