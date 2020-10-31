@@ -1,16 +1,17 @@
 <resources>
     <string name="app_name">LunchScanner</string>
-    <string name="settings">Einstellungen</string>
+    <string name="settings">Settings</string>
 
-    <string name="pref_title_rescan">Neuscannen intervall</string>
-    <string-array name="pref_rescan_titles">
-        <item>1 Sekunde</item>
-        <item>2 Sekunden</item>
-        <item>3 Sekunden</item>
-        <item>4 Sekunden</item>
-        <item>5 Sekunden</item>
+    <string name="pref_title_rescan">Automatic rescanning</string>
+    <string name="pref_title_rescan_time">Result display</string>
+    <string-array name="pref_rescan_time_titles">
+        <item>1 second</item>
+        <item>2 seconds</item>
+        <item>3 seconds</item>
+        <item>4 seconds</item>
+        <item>5 seconds</item>
     </string-array>
-    <string-array name="pref_rescan_values">
+    <string-array name="pref_rescan_time_values">
         <item>1</item>
         <item>2</item>
         <item>3</item>
@@ -18,36 +19,39 @@
         <item>5</item>
     </string-array>
 
-    <string name="csv_import_ongoing">CSV-Daten wird importiert…</string>
-    <string name="csv_import">CSV-Daten Import</string>
-    <string name="error">Fehler</string>
-    <string name="no_file_found">Es wurde keine CSV-Datei gefunden!</string>
-    <string name="csv_file_copy">CSV-Daten (Tag) importieren</string>
-    <string name="csv_file_copy_allergy">CSV-Daten (Allergie) importieren</string>
-    <string name="gotLunch">Kommt zum %d. mal</string>
-    <string name="delete_data">Daten löschen</string>
-    <string name="lunch_display">Essensanzeige</string>
-    <string name="start_text">Um die benötigte CSV-Datei zu importieren, müssen die Einstellungen mittels des Zahnrades geöffnet werden. Nun über die drei Punkte die Auswahltmöglichkeit \'CSV-Daten (Tag) importieren\' und die Frage mit OK beantworten. Durch ein betätigen dieser Taste wird der Import eingeleitet, wenn das importieren erfolgreich war kommt eine dementsprechende Meldung. Wenn die CSV-Datei importiert wurde, ist der Scanner bereit. Dazu einfach auf das Icon mit der Kamera drücken und schon öffnet sich der Scanner, nun kann eine Essenskarte gescannt werden. Um den Intervall der Scans einzustellen kann man wieder über das Zahnrad die Einstellungen öffnen. Wenn der Tag vorbei ist muss man die Daten wieder über das Zahnrad und die drei Punkte löschen.</string>
-    <string name="start_title">Scannerbenutzung</string>
-    <string name="copy_request_day">Die alte Tagesdatei wird ersetzt!\nMöchten sie alte Essendaten löschen?</string>
-    <string name="copy_request_allergy">Die alten Allergiedaten werden ersetzt!\nMöchten sie wirklich fortfahren?</string>
-    <string name="delete">Löschen</string>
-    <string name="delete_request">Alle Essensdaten werden entfernt!\nMöchten sie wirklich fortfahren?</string>
-    <string name="stats">Statistiken</string>
-    <string name="collecting_data">Sammle Daten</string>
-    <string name="collecting_data_lunch">Sammle Statistik-Daten für den aktuellen Tag</string>
-    <string name="ordered">Bestellt</string>
-    <string name="got">Ausgegeben</string>
-    <string name="get">Auszugegeben</string>
-    <string name="S">S</string>
-    <string name="B">B</string>
-    <string name="A">A</string>
-    <string name="choose_allergy">Bitte wähle die Allergiedatei aus!</string>
-    <string name="choose_day">Bitte wähle die Tagesdatei aus!</string>
-    <string name="getLunchA">Auszugegebende Essen A</string>
-    <string name="getLunchB">Auszugegebende Essen B</string>
-    <string name="getLunchS">Auszugegebende Essen S</string>
-    <string name="yes">Ja</string>
-    <string name="no">Nein</string>
-    <string name="canel">Abbrechen</string>
+    <string name="csv_import_ongoing">Importing CSV data…</string>
+    <string name="csv_import">CSV data import</string>
+    <string name="error">Error</string>
+    <string name="no_file_found">No CSV file was found!</string>
+    <string name="csv_file_copy">Import CSV data (day)</string>
+    <string name="csv_file_copy_allergy">Import CSV data (allergy)</string>
+    <string name="gotLunch">Comes for the %d. time</string>
+    <string name="delete_data">Delete data</string>
+    <string name="lunch_display">Lunch display</string>
+    <string name="start_text">In order to import the required CSV file, the settings must be opened using the gear wheel. Now use the three points to select \'Import CSV data (day)\' and answer the question with OK. Pressing this button initiates the import. If the import was successful, a corresponding message appears. When the CSV file has been imported, the scanner is ready. Simply press the icon with the camera and the scanner opens, and a meal card can now be scanned. In order to set the interval of the scans, the settings can be opened again via the gearwheel. When the day is over you have to delete the data again via the gear and the three points.</string>
+    <string name="start_title">Use of the scanner</string>
+    <string name="copy_request_day">The old daily file will be replaced!\nWould you like to delete old meal details?</string>
+    <string name="copy_request_allergy">The old allergy data will be replaced!\nAre you sure you want to continue?</string>
+    <string name="delete">Delete</string>
+    <string name="delete_request">All meal dates will be removed!\nAre you sure you want to continue?</string>
+    <string name="stats">Statistics</string>
+    <string name="collecting_data">Collecting data</string>
+    <string name="collecting_data_lunch">Collect statistical data for the current day</string>
+    <string name="ordered">Ordered</string>
+    <string name="got">Served</string>
+    <string name="get">To serve</string>
+    <string name="S" translatable="false">S</string>
+    <string name="B" translatable="false">B</string>
+    <string name="A" translatable="false">A</string>
+    <string name="choose_allergy">Please select the allergy file!</string>
+    <string name="choose_day">Please select the daily file!</string>
+    <string name="getLunchA">To serve lunch A</string>
+    <string name="getLunchB">To serve lunch B</string>
+    <string name="getLunchS">To serve lunch S</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="cancel">Cancel</string>
+    <string name="x_class">%s. grade</string>
+    <string name="duplicate_xba">Duplicate XBA found!</string>
+
 </resources>

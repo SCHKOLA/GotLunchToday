@@ -53,7 +53,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //Set Content
         setContentView(R.layout.activity_settings);
-        getFragmentManager().beginTransaction().replace(R.id.content_frame, new SettingsFragment()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new SettingsFragment()).commit();
         dbAccess = new DatabaseAccess(getApplicationContext());
     }
 
@@ -76,7 +76,7 @@ public class SettingsActivity extends AppCompatActivity {
                             startCopy(false);
                         })
                         .setNegativeButton(R.string.no, (dialog, witch) -> startCopy(false))
-                        .setNeutralButton(R.string.canel, null)
+                        .setNeutralButton(R.string.cancel, null)
                         .create().show();
                 return true;
             case R.id.action_CSV_copy_allergy:
