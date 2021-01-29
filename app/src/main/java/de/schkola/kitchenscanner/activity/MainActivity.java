@@ -28,6 +28,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import de.schkola.kitchenscanner.R;
@@ -35,7 +37,7 @@ import de.schkola.kitchenscanner.R;
 public class MainActivity extends AppCompatActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Set Content
         setContentView(R.layout.activity_main);
@@ -56,17 +58,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                //Start settings
-                startActivity(new Intent(this, SettingsActivity.class));
-                return true;
-            case R.id.action_stats:
-                startActivity(new Intent(this, StatsActivity.class));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_settings) {
+            //Start settings
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        } else if (item.getItemId() == R.id.action_stats) {
+            startActivity(new Intent(this, StatsActivity.class));
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 }
