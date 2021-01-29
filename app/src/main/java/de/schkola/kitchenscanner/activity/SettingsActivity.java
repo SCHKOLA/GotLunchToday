@@ -33,19 +33,26 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.database.DatabaseAccess;
 import de.schkola.kitchenscanner.task.CsvImportTask;
 import de.schkola.kitchenscanner.task.DatabaseClearTask;
+import de.schkola.kitchenscanner.task.LunchExportTask;
 import de.schkola.kitchenscanner.task.ProgressAsyncTask;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class SettingsActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_DAY = 42;
     private static final int REQUEST_CODE_ALLERGY = 43;
+    private static final int REQUEST_EXPORT = 44;
 
     private DatabaseAccess dbAccess;
 
@@ -66,48 +73,46 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_CSV_copy:
-                //Start copy CSV-Files
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.csv_import)
-                        .setMessage(R.string.copy_request_day)
-                        .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
-                            deleteFiles();
-                            startCopy(false);
-                        })
-                        .setNegativeButton(R.string.no, (dialog, witch) -> startCopy(false))
-                        .setNeutralButton(R.string.cancel, null)
-                        .create().show();
-                return true;
-            case R.id.action_CSV_copy_allergy:
-                //Start copy CSV-Files
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.csv_import)
-                        .setMessage(R.string.copy_request_allergy)
-                        .setPositiveButton(R.string.yes, (dialogInterface, i) -> startCopy(true))
-                        .setNegativeButton(R.string.no, null)
-                        .create().show();
-                return true;
-            case R.id.action_delete_data:
-                //Delete Cache
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.delete)
-                        .setMessage(R.string.delete_request)
-                        .setPositiveButton(R.string.yes, (dialogInterface, i) -> deleteFiles())
-                        .setNegativeButton(R.string.no, null)
-                        .create().show();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.action_CSV_copy) {
+            //Start copy CSV-Files
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.csv_import)
+                    .setMessage(R.string.copy_request_day)
+                    .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
+                        deleteFiles();
+                        startCopy(false);
+                    })
+                    .setNegativeButton(R.string.no, (dialog, witch) -> startCopy(false))
+                    .setNeutralButton(R.string.cancel, null)
+                    .create().show();
+            return true;
+        } else if (item.getItemId() == R.id.action_CSV_copy_allergy) {
+            //Start copy CSV-Files
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.csv_import)
+                    .setMessage(R.string.copy_request_allergy)
+                    .setPositiveButton(R.string.yes, (dialogInterface, i) -> startCopy(true))
+                    .setNegativeButton(R.string.no, null)
+                    .create().show();
+            return true;
+        } else if (item.getItemId() == R.id.action_delete_data) {
+            //Delete Cache
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.delete)
+                    .setMessage(R.string.delete_request)
+                    .setPositiveButton(R.string.yes, (dialogInterface, i) -> deleteFiles())
+                    .setNegativeButton(R.string.no, null)
+                    .create().show();
+            return true;
+        } else if (item.getItemId() == R.id.action_export_lunch_data) {
+            //Export Lunch Data to CSV
+            startExport();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     private void startCopy(boolean allergy) {
-        ProgressDialog dialog = new ProgressDialog(this);
-        dialog.setCancelable(false);
-        dialog.setTitle(getString(R.string.csv_import));
-        dialog.setMessage(getString(R.string.csv_import_ongoing));
         int text = allergy ? R.string.choose_allergy : R.string.choose_day;
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -119,6 +124,37 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void deleteFiles() {
         new DatabaseClearTask(dbAccess.getDatabase()).execute();
+    }
+
+    private void startExport() {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Date date = new Date(System.currentTimeMillis());
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/csv");
+        intent.putExtra(Intent.EXTRA_TITLE, String.format("export-lunch-%s.csv", formatter.format(date)));
+        startActivityForResult(intent, REQUEST_EXPORT);
+    }
+
+    private LunchExportTask createExportTask() {
+        ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setCancelable(false);
+        dialog.setTitle(getString(R.string.lunch_export));
+        dialog.setMessage(getString(R.string.lunch_export_ongoing));
+        LunchExportTask lunchExportTask = new LunchExportTask(dbAccess.getDatabase());
+        lunchExportTask.setProgressListener(new ProgressAsyncTask.ProgressListener() {
+            @Override
+            public void onStart() {
+                dialog.show();
+            }
+
+            @Override
+            public void onFinished() {
+                dialog.dismiss();
+                dialog.cancel();
+            }
+        });
+        return lunchExportTask;
     }
 
     private CsvImportTask createScanTask(boolean allergy) {
@@ -148,19 +184,33 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-        super.onActivityResult(requestCode, resultCode, resultData);
-        if (resultData != null && resultCode == Activity.RESULT_OK) {
-            Uri data = resultData.getData();
-            if (data != null) {
-                InputStream inputStream;
-                try {
-                    inputStream = getContentResolver().openInputStream(data);
-                } catch (FileNotFoundException ignored) {
-                    return;
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent resultData) {
+        if (requestCode == REQUEST_CODE_DAY || requestCode == REQUEST_CODE_ALLERGY) {
+            if (resultData != null && resultCode == Activity.RESULT_OK) {
+                Uri data = resultData.getData();
+                if (data != null) {
+                    InputStream inputStream;
+                    try {
+                        inputStream = getContentResolver().openInputStream(data);
+                    } catch (FileNotFoundException ignored) {
+                        return;
+                    }
+                    createScanTask(requestCode == REQUEST_CODE_ALLERGY).execute(inputStream);
                 }
-                createScanTask(requestCode == REQUEST_CODE_ALLERGY).execute(inputStream);
+            }
+        } else if (requestCode == REQUEST_EXPORT) {
+            if (resultData != null && resultCode == Activity.RESULT_OK) {
+                Uri data = resultData.getData();
+                if (data != null) {
+                    try {
+                        OutputStream outputStream = getContentResolver().openOutputStream(data);
+                        createExportTask().execute(outputStream);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
+        super.onActivityResult(requestCode, resultCode, resultData);
     }
 }

@@ -53,5 +53,8 @@
     <string name="cancel">Cancel</string>
     <string name="x_class">%s. grade</string>
     <string name="duplicate_xba">Duplicate XBA found!</string>
+    <string name="export_lunch_data">Export Lunch Data</string>
+    <string name="lunch_export">Lunch data export</string>
+    <string name="lunch_export_ongoing">Exporting Lunch data…</string>
 
 </resources>

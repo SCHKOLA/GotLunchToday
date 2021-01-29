@@ -4,6 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".activity.SettingsActivity">
     <item
+        android:id="@+id/action_export_lunch_data"
+        android:orderInCategory="60"
+        android:title="@string/export_lunch_data"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_CSV_copy"
         android:orderInCategory="50"
         android:title="@string/csv_file_copy"

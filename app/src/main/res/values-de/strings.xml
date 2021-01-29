@@ -42,4 +42,8 @@
     <string name="no">Nein</string>
     <string name="x_class">%s. Klasse</string>
     <string name="duplicate_xba">Doppelte XBA gefunden!</string>
+    <string name="export_lunch_data">Essen-Daten exportieren</string>
+    <string name="lunch_export">Essen-Daten export</string>
+    <string name="lunch_export_ongoing">Essen-Daten werden exportiert…</string>
+
 </resources>

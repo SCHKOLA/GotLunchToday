@@ -21,6 +21,9 @@ public interface CustomerDao {
     @Query("SELECT * FROM customers WHERE xba = :xba")
     Customer getCustomer(int xba);
 
+    @Query("SELECT * FROM customers WHERE gotLunch > 0")
+    List<Customer> getCustomerGotLunch();
+
     @Query("DELETE FROM customers")
     void deleteAll();
 }
