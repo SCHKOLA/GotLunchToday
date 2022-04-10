@@ -5,7 +5,7 @@ import de.schkola.kitchenscanner.database.LunchDatabase;
 
 public class DatabaseClearTask extends AsyncTask<Void, Void, Void> {
 
-    private LunchDatabase database;
+    private final LunchDatabase database;
 
     public DatabaseClearTask(LunchDatabase database) {
         this.database = database;

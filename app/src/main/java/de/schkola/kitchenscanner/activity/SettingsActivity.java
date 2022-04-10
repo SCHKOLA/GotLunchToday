@@ -33,6 +33,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import de.schkola.kitchenscanner.R;
@@ -72,7 +73,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_CSV_copy) {
             //Start copy CSV-Files
             new AlertDialog.Builder(this)
@@ -136,6 +137,7 @@ public class SettingsActivity extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_EXPORT);
     }
 
+    @NonNull
     private LunchExportTask createExportTask() {
         ProgressDialog dialog = new ProgressDialog(this);
         dialog.setCancelable(false);
@@ -157,6 +159,7 @@ public class SettingsActivity extends AppCompatActivity {
         return lunchExportTask;
     }
 
+    @NonNull
     private CsvImportTask createScanTask(boolean allergy) {
         ProgressDialog dialog = new ProgressDialog(this);
         dialog.setCancelable(false);

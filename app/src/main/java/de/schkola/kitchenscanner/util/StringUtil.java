@@ -1,11 +1,14 @@
 package de.schkola.kitchenscanner.util;
 
+import androidx.annotation.NonNull;
 import de.schkola.kitchenscanner.database.Allergy;
 import java.util.List;
+import org.jetbrains.annotations.Contract;
 
 public interface StringUtil {
 
-    static byte getLunch(String lunch) {
+    @Contract(pure = true)
+    static byte getLunch(@NonNull String lunch) {
         switch (lunch) {
             case "1":
                 return 1;
@@ -18,6 +21,8 @@ public interface StringUtil {
         }
     }
 
+    @NonNull
+    @Contract(pure = true)
     static String getLunch(int lunch) {
         switch (lunch) {
             case 1:
@@ -31,7 +36,8 @@ public interface StringUtil {
         }
     }
 
-    static String getAllergies(List<Allergy> allergies) {
+    @NonNull
+    static String getAllergies(@NonNull List<Allergy> allergies) {
         StringBuilder s = new StringBuilder();
         for (Allergy a : allergies) {
             s.append(a.allergy).append(", ");

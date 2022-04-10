@@ -7,7 +7,7 @@ import de.schkola.kitchenscanner.database.LunchDatabase;
 
 public class CustomerUpdateTask extends AsyncTask<Customer, Void, Void> {
 
-    private LunchDatabase database;
+    private final LunchDatabase database;
 
     public CustomerUpdateTask(LunchDatabase database) {
         this.database = database;

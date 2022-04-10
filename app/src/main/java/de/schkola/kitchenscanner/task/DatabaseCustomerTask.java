@@ -11,8 +11,8 @@ import java.util.List;
 
 public class DatabaseCustomerTask extends AsyncTask<Integer, Void, LunchResult> {
 
-    private LunchDatabase database;
-    private Consumer<LunchResult> consumer;
+    private final LunchDatabase database;
+    private final Consumer<LunchResult> consumer;
 
     public DatabaseCustomerTask(LunchDatabase database, Consumer<LunchResult> consumer) {
         this.database = database;
