@@ -31,6 +31,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -90,7 +91,7 @@ public class DisplayActivity extends AppCompatActivity {
                             if (isRescanEnabled()) {
                                 s.schedule(this::startScan, getRescanTime(), TimeUnit.SECONDS);
                             }
-                        }).execute(Integer.parseInt(scanResult.getContents()));
+                        }).execute(scanResult.getContents());
                     }
                 } catch (Exception ex) {
                     Log.e("DisplayActivity", "Exception onActivityResult", ex);
@@ -113,7 +114,21 @@ public class DisplayActivity extends AppCompatActivity {
         super.finish();
     }
 
-    private void fillInformation(LunchResult result) {
+    private void clearInformation() {
+        TextView name = findViewById(R.id.name);
+        TextView clazz = findViewById(R.id.clazz);
+        TextView lunch = findViewById(R.id.lunch);
+        TextView gotToday = findViewById(R.id.gotToday);
+        TextView allergies = findViewById(R.id.allergies);
+        name.setText("");
+        clazz.setText("");
+        lunch.setText("");
+        gotToday.setText("");
+        allergies.setText("");
+    }
+
+    private void fillInformation(@NonNull LunchResult result) {
+        clearInformation();
         Customer c = result.getCustomer();
         List<Allergy> a = result.getAllergies();
         TextView name = findViewById(R.id.name);
@@ -138,11 +153,7 @@ public class DisplayActivity extends AppCompatActivity {
             allergies.setText(StringUtil.getAllergies(a));
             new CustomerUpdateTask(database).execute(c);
         } else {
-            name.setText("");
-            clazz.setText("");
             lunch.setText("X");
-            gotToday.setText("");
-            allergies.setText("");
         }
     }
 

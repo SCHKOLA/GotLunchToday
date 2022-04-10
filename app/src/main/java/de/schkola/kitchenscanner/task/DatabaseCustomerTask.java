@@ -9,7 +9,7 @@ import de.schkola.kitchenscanner.util.LunchResult;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DatabaseCustomerTask extends AsyncTask<Integer, Void, LunchResult> {
+public class DatabaseCustomerTask extends AsyncTask<String, Void, LunchResult> {
 
     private final LunchDatabase database;
     private final Consumer<LunchResult> consumer;
@@ -20,13 +20,19 @@ public class DatabaseCustomerTask extends AsyncTask<Integer, Void, LunchResult> 
     }
 
     @Override
-    protected LunchResult doInBackground(Integer... integers) {
-        Customer c = database.customerDao().getCustomer(integers[0]);
+    protected LunchResult doInBackground(String... strings) {
         List<Allergy> a = new ArrayList<>();
-        if (c != null) {
-            a = database.allergyDao().getAllergies(c.xba);
+        String cleanedString = strings[0].trim().replaceAll("\\D", "");
+        try {
+            int xba = Integer.parseInt(cleanedString);
+            Customer c = database.customerDao().getCustomer(xba);
+            if (c != null) {
+                a.addAll(database.allergyDao().getAllergies(c.xba));
+            }
+            return new LunchResult(c, a);
+        } catch (NumberFormatException e) {
+            return new LunchResult(null, a);
         }
-        return new LunchResult(c, a);
     }
 
     @Override
