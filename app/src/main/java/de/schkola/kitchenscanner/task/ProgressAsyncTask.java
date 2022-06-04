@@ -1,32 +1,26 @@
 package de.schkola.kitchenscanner.task;
 
-import android.os.AsyncTask;
+import android.app.ProgressDialog;
 
-public abstract class ProgressAsyncTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
+public abstract class ProgressAsyncTask<R> implements AsyncTask<R> {
 
-    private ProgressListener progressListener;
+    private ProgressDialog dialog;
 
-    public void setProgressListener(ProgressListener progressListener) {
-        this.progressListener = progressListener;
+    public void setProgressDialog(ProgressDialog dialog) {
+        this.dialog = dialog;
     }
 
     @Override
-    protected void onPreExecute() {
-        if (progressListener != null)
-            progressListener.onStart();
+    public void onPreExecute() {
+        if (dialog != null)
+            dialog.show();
     }
 
     @Override
-    protected void onPostExecute(Result result) {
-        if (progressListener != null) {
-            progressListener.onFinished();
+    public void onPostExecute(R result) {
+        if (dialog != null) {
+            dialog.dismiss();
+            dialog.cancel();
         }
-    }
-
-    public interface ProgressListener {
-
-        void onStart();
-
-        void onFinished();
     }
 }

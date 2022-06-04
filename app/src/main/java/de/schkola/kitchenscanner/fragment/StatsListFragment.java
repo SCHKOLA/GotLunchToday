@@ -14,8 +14,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.database.DatabaseAccess;
-import de.schkola.kitchenscanner.task.ProgressAsyncTask;
 import de.schkola.kitchenscanner.task.StatTask;
+import de.schkola.kitchenscanner.task.TaskRunner;
 import de.schkola.kitchenscanner.util.LunchListAdapter;
 
 public class StatsListFragment extends Fragment {
@@ -43,19 +43,8 @@ public class StatsListFragment extends Fragment {
             ExpandableListView listView = view.findViewById(R.id.listview);
             listView.setAdapter(new LunchListAdapter(getContext(), result.getToDispenseA(), result.getToDispenseB(), result.getToDispenseS()));
         });
-        statTask.setProgressListener(new ProgressAsyncTask.ProgressListener() {
-            @Override
-            public void onStart() {
-                dialog.show();
-            }
-
-            @Override
-            public void onFinished() {
-                dialog.dismiss();
-                dialog.cancel();
-            }
-        });
-        statTask.execute();
+        statTask.setProgressDialog(dialog);
+        TaskRunner.INSTANCE.executeAsyncTask(statTask);
     }
 
     @Override

@@ -14,8 +14,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.database.DatabaseAccess;
-import de.schkola.kitchenscanner.task.ProgressAsyncTask;
 import de.schkola.kitchenscanner.task.StatTask;
+import de.schkola.kitchenscanner.task.TaskRunner;
 
 public class StatsChartFragment extends Fragment {
 
@@ -49,19 +49,8 @@ public class StatsChartFragment extends Fragment {
             ((TextView) view.findViewById(R.id.gotS)).setText(String.valueOf(result.getDispensedS()));
             ((TextView) view.findViewById(R.id.getS)).setText(String.valueOf(result.getToDispenseS().size()));
         });
-        statTask.setProgressListener(new ProgressAsyncTask.ProgressListener() {
-            @Override
-            public void onStart() {
-                dialog.show();
-            }
-
-            @Override
-            public void onFinished() {
-                dialog.dismiss();
-                dialog.cancel();
-            }
-        });
-        statTask.execute();
+        statTask.setProgressDialog(dialog);
+        TaskRunner.INSTANCE.executeAsyncTask(statTask);
     }
 
     @Override

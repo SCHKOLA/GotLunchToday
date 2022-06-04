@@ -42,11 +42,11 @@ import de.schkola.kitchenscanner.database.Allergy;
 import de.schkola.kitchenscanner.database.Customer;
 import de.schkola.kitchenscanner.database.DatabaseAccess;
 import de.schkola.kitchenscanner.database.LunchDatabase;
-import de.schkola.kitchenscanner.task.CustomerUpdateTask;
-import de.schkola.kitchenscanner.task.DatabaseCustomerTask;
+import de.schkola.kitchenscanner.task.TaskRunner;
 import de.schkola.kitchenscanner.util.LunchResult;
 import de.schkola.kitchenscanner.util.StringUtil;
 import de.schkola.kitchenscanner.util.TorchManager;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -86,12 +86,25 @@ public class DisplayActivity extends AppCompatActivity {
                 try {
                     IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
                     if (scanResult != null && scanResult.getContents() != null) {
-                        new DatabaseCustomerTask(database, c -> {
-                            fillInformation(c);
+                        TaskRunner.INSTANCE.executeAsync(() -> {
+                            List<Allergy> a = new ArrayList<>();
+                            String cleanedString = scanResult.getContents().trim().replaceAll("\\D", "");
+                            try {
+                                int xba = Integer.parseInt(cleanedString);
+                                Customer c = database.customerDao().getCustomer(xba);
+                                if (c != null) {
+                                    a.addAll(database.allergyDao().getAllergies(c.xba));
+                                }
+                                return new LunchResult(c, a);
+                            } catch (NumberFormatException e) {
+                                return new LunchResult(null, a);
+                            }
+                        }, lunchResult -> {
+                            fillInformation(lunchResult);
                             if (isRescanEnabled()) {
                                 s.schedule(this::startScan, getRescanTime(), TimeUnit.SECONDS);
                             }
-                        }).execute(scanResult.getContents());
+                        });
                     }
                 } catch (Exception ex) {
                     Log.e("DisplayActivity", "Exception onActivityResult", ex);
@@ -151,7 +164,7 @@ public class DisplayActivity extends AppCompatActivity {
                 gotToday.setText("");
             }
             allergies.setText(StringUtil.getAllergies(a));
-            new CustomerUpdateTask(database).execute(c);
+            TaskRunner.INSTANCE.executeAsync(() -> database.customerDao().updateCustomer(c));
         } else {
             lunch.setText("X");
         }

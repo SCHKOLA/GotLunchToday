@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class StatTask extends ProgressAsyncTask<Void, Void, StatsResult> {
+public class StatTask extends ProgressAsyncTask<StatsResult> {
 
     private final LunchDatabase database;
     private final Consumer<StatsResult> runnable;
@@ -43,7 +43,7 @@ public class StatTask extends ProgressAsyncTask<Void, Void, StatsResult> {
     }
 
     @Override
-    protected StatsResult doInBackground(Void... params) {
+    public StatsResult doInBackground() {
         int lunchA = database.lunchDao().getLunchCount(1);
         int lunchB = database.lunchDao().getLunchCount(2);
         int lunchS = database.lunchDao().getLunchCount(3);
@@ -84,7 +84,7 @@ public class StatTask extends ProgressAsyncTask<Void, Void, StatsResult> {
     }
 
     @Override
-    protected void onPostExecute(StatsResult jsonObject) {
+    public void onPostExecute(StatsResult jsonObject) {
         super.onPostExecute(jsonObject);
         runnable.accept(jsonObject);
     }

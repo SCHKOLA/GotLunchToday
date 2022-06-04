@@ -10,17 +10,19 @@ import java.util.List;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
-public class LunchExportTask extends ProgressAsyncTask<OutputStream, Void, Boolean> {
+public class LunchExportTask extends ProgressAsyncTask<Void> {
 
     private final LunchDatabase database;
+    private final OutputStream outputStream;
 
-    public LunchExportTask(LunchDatabase database) {
+    public LunchExportTask(LunchDatabase database, OutputStream outputStream) {
         this.database = database;
+        this.outputStream = outputStream;
     }
 
     @Override
-    protected Boolean doInBackground(OutputStream... outputStream) {
-        try (CSVPrinter printer = new CSVPrinter(new OutputStreamWriter(outputStream[0], StandardCharsets.ISO_8859_1), CSVFormat.DEFAULT)) {
+    public Void doInBackground() {
+        try (CSVPrinter printer = new CSVPrinter(new OutputStreamWriter(outputStream, StandardCharsets.ISO_8859_1), CSVFormat.DEFAULT)) {
             printer.printRecord("XBA", "Name", "Gericht");
             List<Customer> c = database.customerDao().getCustomerGotLunch();
             for (Customer customer : c) {
@@ -30,9 +32,10 @@ public class LunchExportTask extends ProgressAsyncTask<OutputStream, Void, Boole
             e.printStackTrace();
         } finally {
             try {
-                outputStream[0].flush();
-                outputStream[0].close();
+                outputStream.flush();
+                outputStream.close();
             } catch (IOException ignored) {
+                // Empty on purpose
             }
         }
         return null;

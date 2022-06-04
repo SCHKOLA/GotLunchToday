@@ -14,16 +14,18 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-public class CsvImportTask extends ProgressAsyncTask<InputStream, Void, Boolean> {
+public class CsvImportTask extends ProgressAsyncTask<Void> {
 
     private final LunchDatabase database;
     private final boolean allergy;
+    private final InputStream inputStream;
     private final Set<String> duplicateXba = Collections.synchronizedSet(new LinkedHashSet<>());
     private CsvImportTask.CsvImportListener cil;
 
-    public CsvImportTask(LunchDatabase db, boolean allergy) {
+    public CsvImportTask(LunchDatabase db, boolean allergy, InputStream inputStream) {
         this.database = db;
         this.allergy = allergy;
+        this.inputStream = inputStream;
     }
 
     public void setCsvImportListener(CsvImportTask.CsvImportListener cil) {
@@ -31,7 +33,7 @@ public class CsvImportTask extends ProgressAsyncTask<InputStream, Void, Boolean>
     }
 
     @Override
-    protected Boolean doInBackground(InputStream... inputStreams) {
+    public Void doInBackground() {
         try {
             CSVFormat format = CSVFormat.DEFAULT.withAllowMissingColumnNames();
             if (!allergy) {
@@ -40,7 +42,7 @@ public class CsvImportTask extends ProgressAsyncTask<InputStream, Void, Boolean>
                         .withHeader();
             }
 
-            CSVParser csvParser = CSVParser.parse(inputStreams[0], StandardCharsets.ISO_8859_1, format);
+            CSVParser csvParser = CSVParser.parse(inputStream, StandardCharsets.ISO_8859_1, format);
             if (allergy) {
                 database.allergyDao().deleteAll();
                 scanAllergy(csvParser, database);
@@ -51,7 +53,7 @@ public class CsvImportTask extends ProgressAsyncTask<InputStream, Void, Boolean>
             e.printStackTrace();
         } finally {
             try {
-                inputStreams[0].close();
+                inputStream.close();
             } catch (IOException ignored) {
             }
         }
@@ -59,7 +61,7 @@ public class CsvImportTask extends ProgressAsyncTask<InputStream, Void, Boolean>
     }
 
     @Override
-    protected void onPostExecute(Boolean result) {
+    public void onPostExecute(Void result) {
         super.onPostExecute(result);
         if (cil != null && !duplicateXba.isEmpty()) {
             cil.onDuplicateXba(duplicateXba);
@@ -68,15 +70,15 @@ public class CsvImportTask extends ProgressAsyncTask<InputStream, Void, Boolean>
 
     private void scanDay(CSVParser csvParser, LunchDatabase database) {
         try {
-            for (CSVRecord record : csvParser) {
+            for (CSVRecord r : csvParser) {
                 Customer customer = new Customer();
-                customer.grade = record.get("Klasse");
-                customer.xba = Integer.parseInt(record.get("XBA"));
-                customer.name = record.get("Name");
-                customer.lunch = StringUtil.getLunch(record.get("Gericht"));
+                customer.grade = r.get("Klasse");
+                customer.xba = Integer.parseInt(r.get("XBA"));
+                customer.name = r.get("Name");
+                customer.lunch = StringUtil.getLunch(r.get("Gericht"));
                 Customer checkCustomer = database.customerDao().getCustomer(customer.xba);
                 if (checkCustomer != null) {
-                    duplicateXba.add(String.format("[%s]: %s", record.get("XBA"), record.get("Name")));
+                    duplicateXba.add(String.format("[%s]: %s", r.get("XBA"), r.get("Name")));
                     continue;
                 }
                 database.customerDao().insertCustomer(customer);
@@ -87,13 +89,11 @@ public class CsvImportTask extends ProgressAsyncTask<InputStream, Void, Boolean>
     }
 
     private void scanAllergy(CSVParser csvParser, LunchDatabase database) {
-        int xba = 0;
-        int allergy = 1;
         try {
-            for (CSVRecord record : csvParser) {
+            for (CSVRecord r : csvParser) {
                 Allergy a = new Allergy();
-                a.xba = Integer.parseInt(record.get(xba));
-                a.allergy = record.get(allergy);
+                a.xba = Integer.parseInt(r.get(0));
+                a.allergy = r.get(1);
                 database.allergyDao().insertAllergy(a);
             }
         } catch (Exception ex) {

@@ -39,9 +39,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.database.DatabaseAccess;
 import de.schkola.kitchenscanner.task.CsvImportTask;
-import de.schkola.kitchenscanner.task.DatabaseClearTask;
 import de.schkola.kitchenscanner.task.LunchExportTask;
-import de.schkola.kitchenscanner.task.ProgressAsyncTask;
+import de.schkola.kitchenscanner.task.TaskRunner;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -124,7 +123,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void deleteFiles() {
-        new DatabaseClearTask(dbAccess.getDatabase()).execute();
+        TaskRunner.INSTANCE.executeAsync(() -> dbAccess.getDatabase().customerDao().deleteAll());
     }
 
     private void startExport() {
@@ -138,46 +137,24 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     @NonNull
-    private LunchExportTask createExportTask() {
+    private LunchExportTask createExportTask(OutputStream outputStream) {
         ProgressDialog dialog = new ProgressDialog(this);
         dialog.setCancelable(false);
         dialog.setTitle(getString(R.string.lunch_export));
         dialog.setMessage(getString(R.string.lunch_export_ongoing));
-        LunchExportTask lunchExportTask = new LunchExportTask(dbAccess.getDatabase());
-        lunchExportTask.setProgressListener(new ProgressAsyncTask.ProgressListener() {
-            @Override
-            public void onStart() {
-                dialog.show();
-            }
-
-            @Override
-            public void onFinished() {
-                dialog.dismiss();
-                dialog.cancel();
-            }
-        });
+        LunchExportTask lunchExportTask = new LunchExportTask(dbAccess.getDatabase(), outputStream);
+        lunchExportTask.setProgressDialog(dialog);
         return lunchExportTask;
     }
 
     @NonNull
-    private CsvImportTask createScanTask(boolean allergy) {
+    private CsvImportTask createScanTask(boolean allergy, InputStream inputStream) {
         ProgressDialog dialog = new ProgressDialog(this);
         dialog.setCancelable(false);
         dialog.setTitle(getString(R.string.csv_import));
         dialog.setMessage(getString(R.string.csv_import_ongoing));
-        CsvImportTask csvImportTask = new CsvImportTask(dbAccess.getDatabase(), allergy);
-        csvImportTask.setProgressListener(new ProgressAsyncTask.ProgressListener() {
-            @Override
-            public void onStart() {
-                dialog.show();
-            }
-
-            @Override
-            public void onFinished() {
-                dialog.dismiss();
-                dialog.cancel();
-            }
-        });
+        CsvImportTask csvImportTask = new CsvImportTask(dbAccess.getDatabase(), allergy, inputStream);
+        csvImportTask.setProgressDialog(dialog);
         csvImportTask.setCsvImportListener(duplicateXba -> new AlertDialog.Builder(this)
                 .setTitle(R.string.duplicate_xba)
                 .setItems(duplicateXba.toArray(new String[0]), null)
@@ -198,7 +175,7 @@ public class SettingsActivity extends AppCompatActivity {
                     } catch (FileNotFoundException ignored) {
                         return;
                     }
-                    createScanTask(requestCode == REQUEST_CODE_ALLERGY).execute(inputStream);
+                    TaskRunner.INSTANCE.executeAsyncTask(createScanTask(requestCode == REQUEST_CODE_ALLERGY, inputStream));
                 }
             }
         } else if (requestCode == REQUEST_EXPORT) {
@@ -207,7 +184,7 @@ public class SettingsActivity extends AppCompatActivity {
                 if (data != null) {
                     try {
                         OutputStream outputStream = getContentResolver().openOutputStream(data);
-                        createExportTask().execute(outputStream);
+                        TaskRunner.INSTANCE.executeAsyncTask(createExportTask(outputStream));
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
