@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 32
 
     defaultConfig {
         applicationId "de.schkola.kitchenscanner"
         minSdkVersion 21
-        targetSdkVersion 31
-        versionCode 7
-        versionName "1.5.1"
+        targetSdkVersion 32
+        versionCode 8
+        versionName "1.6.0"
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -25,7 +25,7 @@ dependencies {
     implementation 'androidx.preference:preference:1.2.0'
     implementation 'androidx.room:room-runtime:2.4.2'
     annotationProcessor 'androidx.room:room-compiler:2.4.2'
-    implementation 'com.google.android.material:material:1.5.0'
+    implementation 'com.google.android.material:material:1.6.0'
     implementation('com.journeyapps:zxing-android-embedded:4.1.0') { transitive = false }
     //noinspection GradleDependency
     implementation 'com.google.zxing:core:3.3.0'
