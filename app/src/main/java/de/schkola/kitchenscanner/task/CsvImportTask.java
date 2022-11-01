@@ -13,6 +13,7 @@ import java.util.Set;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.csv.QuoteMode;
 
 public class CsvImportTask extends ProgressAsyncTask<Void> {
 
@@ -37,12 +38,12 @@ public class CsvImportTask extends ProgressAsyncTask<Void> {
         try {
             CSVFormat format = CSVFormat.DEFAULT.withAllowMissingColumnNames();
             if (!allergy) {
-                format = format.withDelimiter(';')
+                format = format.withQuoteMode(QuoteMode.MINIMAL)
                         .withSkipHeaderRecord()
                         .withHeader();
             }
 
-            CSVParser csvParser = CSVParser.parse(inputStream, StandardCharsets.ISO_8859_1, format);
+            CSVParser csvParser = CSVParser.parse(inputStream, StandardCharsets.UTF_8, format);
             if (allergy) {
                 database.allergyDao().deleteAll();
                 scanAllergy(csvParser, database);
@@ -55,6 +56,7 @@ public class CsvImportTask extends ProgressAsyncTask<Void> {
             try {
                 inputStream.close();
             } catch (IOException ignored) {
+                // Empty on purpose
             }
         }
         return null;
@@ -71,6 +73,7 @@ public class CsvImportTask extends ProgressAsyncTask<Void> {
     private void scanDay(CSVParser csvParser, LunchDatabase database) {
         try {
             for (CSVRecord r : csvParser) {
+
                 Customer customer = new Customer();
                 customer.grade = r.get("Klasse");
                 customer.xba = Integer.parseInt(r.get("XBA"));

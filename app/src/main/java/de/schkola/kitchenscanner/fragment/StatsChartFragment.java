@@ -1,6 +1,5 @@
 package de.schkola.kitchenscanner.fragment;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,10 +33,6 @@ public class StatsChartFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ProgressDialog dialog = new ProgressDialog(getContext());
-        dialog.setCancelable(false);
-        dialog.setTitle(getString(R.string.collecting_data));
-        dialog.setMessage(getString(R.string.collecting_data_lunch));
         StatTask statTask = new StatTask((new DatabaseAccess(getContext())).getDatabase(), result -> {
             ((TextView) view.findViewById(R.id.orderedA)).setText(String.valueOf(result.getLunchA()));
             ((TextView) view.findViewById(R.id.gotA)).setText(String.valueOf(result.getDispensedA()));
@@ -48,8 +43,8 @@ public class StatsChartFragment extends Fragment {
             ((TextView) view.findViewById(R.id.orderedS)).setText(String.valueOf(result.getLunchS()));
             ((TextView) view.findViewById(R.id.gotS)).setText(String.valueOf(result.getDispensedS()));
             ((TextView) view.findViewById(R.id.getS)).setText(String.valueOf(result.getToDispenseS().size()));
+            view.findViewById(R.id.statsOverviewLoadingScreen).setVisibility(View.GONE);
         });
-        statTask.setProgressDialog(dialog);
         TaskRunner.INSTANCE.executeAsyncTask(statTask);
     }
 

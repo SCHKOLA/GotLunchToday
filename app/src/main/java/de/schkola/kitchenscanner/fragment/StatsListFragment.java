@@ -1,6 +1,5 @@
 package de.schkola.kitchenscanner.fragment;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,15 +34,11 @@ public class StatsListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ProgressDialog dialog = new ProgressDialog(getContext());
-        dialog.setCancelable(false);
-        dialog.setTitle(getString(R.string.collecting_data));
-        dialog.setMessage(getString(R.string.collecting_data_lunch));
         StatTask statTask = new StatTask((new DatabaseAccess(getContext())).getDatabase(), result -> {
             ExpandableListView listView = view.findViewById(R.id.listview);
             listView.setAdapter(new LunchListAdapter(getContext(), result.getToDispenseA(), result.getToDispenseB(), result.getToDispenseS()));
+            view.findViewById(R.id.statsListLoadingScreen).setVisibility(View.GONE);
         });
-        statTask.setProgressDialog(dialog);
         TaskRunner.INSTANCE.executeAsyncTask(statTask);
     }
 

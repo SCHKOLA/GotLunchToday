@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class StatTask extends ProgressAsyncTask<StatsResult> {
+public class StatTask implements AsyncTask<StatsResult> {
 
     private final LunchDatabase database;
     private final Consumer<StatsResult> runnable;
@@ -85,7 +85,6 @@ public class StatTask extends ProgressAsyncTask<StatsResult> {
 
     @Override
     public void onPostExecute(StatsResult jsonObject) {
-        super.onPostExecute(jsonObject);
         runnable.accept(jsonObject);
     }
 }

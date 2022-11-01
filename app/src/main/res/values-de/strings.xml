@@ -11,8 +11,6 @@
     <string name="cancel">Abbrechen</string>
     <string name="choose_allergy">Bitte wähle die Allergiedatei aus!</string>
     <string name="choose_day">Bitte wähle die Tagesdatei aus!</string>
-    <string name="collecting_data">Sammle Daten</string>
-    <string name="collecting_data_lunch">Sammle Statistik-Daten für den aktuellen Tag</string>
     <string name="copy_request_allergy">Die alten Allergiedaten werden ersetzt!\nMöchten sie wirklich fortfahren?</string>
     <string name="copy_request_day">Die alte Tagesdatei wird ersetzt!\nMöchten sie alte Essendaten löschen?</string>
     <string name="settings">Einstellungen</string>

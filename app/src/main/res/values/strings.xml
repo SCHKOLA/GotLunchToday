@@ -35,8 +35,6 @@
     <string name="delete">Delete</string>
     <string name="delete_request">All meal dates will be removed!\nAre you sure you want to continue?</string>
     <string name="stats">Statistics</string>
-    <string name="collecting_data">Collecting data</string>
-    <string name="collecting_data_lunch">Collect statistical data for the current day</string>
     <string name="ordered">Ordered</string>
     <string name="got">Served</string>
     <string name="get">To serve</string>

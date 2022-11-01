@@ -24,19 +24,19 @@
 
 package de.schkola.kitchenscanner.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanIntentResult;
+import com.journeyapps.barcodescanner.ScanOptions;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.database.Allergy;
 import de.schkola.kitchenscanner.database.Customer;
@@ -47,7 +47,6 @@ import de.schkola.kitchenscanner.util.LunchResult;
 import de.schkola.kitchenscanner.util.StringUtil;
 import de.schkola.kitchenscanner.util.TorchManager;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
@@ -56,6 +55,7 @@ import java.util.concurrent.TimeUnit;
 
 public class DisplayActivity extends AppCompatActivity {
 
+    private final ActivityResultLauncher<ScanOptions> qrScanner = registerForActivityResult(new ScanContract(), this::handleScanResult);
     private ScheduledExecutorService s;
     private TorchManager tm;
     private LunchDatabase database;
@@ -77,44 +77,6 @@ public class DisplayActivity extends AppCompatActivity {
             startScan();
         }
         database = new DatabaseAccess(getApplicationContext()).getDatabase();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == IntentIntegrator.REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                try {
-                    IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-                    if (scanResult != null && scanResult.getContents() != null) {
-                        TaskRunner.INSTANCE.executeAsync(() -> {
-                            List<Allergy> a = new ArrayList<>();
-                            String cleanedString = scanResult.getContents().trim().replaceAll("\\D", "");
-                            try {
-                                int xba = Integer.parseInt(cleanedString);
-                                Customer c = database.customerDao().getCustomer(xba);
-                                if (c != null) {
-                                    a.addAll(database.allergyDao().getAllergies(c.xba));
-                                }
-                                return new LunchResult(c, a);
-                            } catch (NumberFormatException e) {
-                                return new LunchResult(null, a);
-                            }
-                        }, lunchResult -> {
-                            fillInformation(lunchResult);
-                            if (isRescanEnabled()) {
-                                s.schedule(this::startScan, getRescanTime(), TimeUnit.SECONDS);
-                            }
-                        });
-                    }
-                } catch (Exception ex) {
-                    Log.e("DisplayActivity", "Exception onActivityResult", ex);
-                }
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                finish();
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 
     @Override
@@ -193,10 +155,37 @@ public class DisplayActivity extends AppCompatActivity {
      * Starts barcode scan
      */
     private void startScan() {
-        IntentIntegrator integrator = new IntentIntegrator(this);
-        integrator.addExtra("RESULT_DISPLAY_DURATION_MS", 10L);
-        integrator.setBeepEnabled(true);
-        integrator.setOrientationLocked(true);
-        integrator.initiateScan(Collections.singletonList("QR_CODE"));
+        ScanOptions options = new ScanOptions();
+        options.setDesiredBarcodeFormats(ScanOptions.QR_CODE);
+        options.setBeepEnabled(true);
+        options.setOrientationLocked(true);
+        options.addExtra("RESULT_DISPLAY_DURATION_MS", 10L);
+        qrScanner.launch(options);
+    }
+
+    private void handleScanResult(@NonNull ScanIntentResult result) {
+        if (result.getContents() == null) {
+            finish();
+        } else {
+            TaskRunner.INSTANCE.executeAsync(() -> {
+                List<Allergy> a = new ArrayList<>();
+                String cleanedString = result.getContents().trim().replaceAll("\\D", "");
+                try {
+                    int xba = Integer.parseInt(cleanedString);
+                    Customer c = database.customerDao().getCustomer(xba);
+                    if (c != null) {
+                        a.addAll(database.allergyDao().getAllergies(c.xba));
+                    }
+                    return new LunchResult(c, a);
+                } catch (NumberFormatException e) {
+                    return new LunchResult(null, a);
+                }
+            }, lunchResult -> {
+                fillInformation(lunchResult);
+                if (isRescanEnabled()) {
+                    s.schedule(this::startScan, getRescanTime(), TimeUnit.SECONDS);
+                }
+            });
+        }
     }
 }

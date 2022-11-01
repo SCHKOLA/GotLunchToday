@@ -24,17 +24,16 @@
 
 package de.schkola.kitchenscanner.activity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.database.DatabaseAccess;
@@ -50,11 +49,10 @@ import java.util.Locale;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private static final int REQUEST_CODE_DAY = 42;
-    private static final int REQUEST_CODE_ALLERGY = 43;
-    private static final int REQUEST_EXPORT = 44;
-
     private DatabaseAccess dbAccess;
+    private final ActivityResultLauncher<String> createDocument = registerForActivityResult(new ActivityResultContracts.CreateDocument(), this::handleExport);
+    private final ActivityResultLauncher<String[]> getContentDay = registerForActivityResult(new ActivityResultContracts.OpenDocument(), this::handleUriDay);
+    private final ActivityResultLauncher<String[]> getContentAllergy = registerForActivityResult(new ActivityResultContracts.OpenDocument(), this::handleUriAllergy);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,9 +78,9 @@ public class SettingsActivity extends AppCompatActivity {
                     .setMessage(R.string.copy_request_day)
                     .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
                         deleteFiles();
-                        startCopy(false);
+                        startImport(false);
                     })
-                    .setNegativeButton(R.string.no, (dialog, witch) -> startCopy(false))
+                    .setNegativeButton(R.string.no, (dialog, witch) -> startImport(false))
                     .setNeutralButton(R.string.cancel, null)
                     .create().show();
             return true;
@@ -91,7 +89,7 @@ public class SettingsActivity extends AppCompatActivity {
             new AlertDialog.Builder(this)
                     .setTitle(R.string.csv_import)
                     .setMessage(R.string.copy_request_allergy)
-                    .setPositiveButton(R.string.yes, (dialogInterface, i) -> startCopy(true))
+                    .setPositiveButton(R.string.yes, (dialogInterface, i) -> startImport(true))
                     .setNegativeButton(R.string.no, null)
                     .create().show();
             return true;
@@ -112,14 +110,15 @@ public class SettingsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void startCopy(boolean allergy) {
+    private void startImport(boolean allergy) {
         int text = allergy ? R.string.choose_allergy : R.string.choose_day;
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/*");
         String[] mimeTypes = {"text/csv", "text/comma-separated-values", "application/octet-stream"};
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-        startActivityForResult(intent, allergy ? REQUEST_CODE_ALLERGY : REQUEST_CODE_DAY);
+        if (allergy) {
+            getContentAllergy.launch(mimeTypes);
+        } else {
+            getContentDay.launch(mimeTypes);
+        }
     }
 
     private void deleteFiles() {
@@ -129,11 +128,7 @@ public class SettingsActivity extends AppCompatActivity {
     private void startExport() {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         Date date = new Date(System.currentTimeMillis());
-        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("text/csv");
-        intent.putExtra(Intent.EXTRA_TITLE, String.format("export-lunch-%s.csv", formatter.format(date)));
-        startActivityForResult(intent, REQUEST_EXPORT);
+        createDocument.launch(String.format("export-lunch-%s.csv", formatter.format(date)));
     }
 
     @NonNull
@@ -148,7 +143,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     @NonNull
-    private CsvImportTask createScanTask(boolean allergy, InputStream inputStream) {
+    private CsvImportTask createImportTask(boolean allergy, InputStream inputStream) {
         ProgressDialog dialog = new ProgressDialog(this);
         dialog.setCancelable(false);
         dialog.setTitle(getString(R.string.csv_import));
@@ -163,34 +158,34 @@ public class SettingsActivity extends AppCompatActivity {
         return csvImportTask;
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent resultData) {
-        if (requestCode == REQUEST_CODE_DAY || requestCode == REQUEST_CODE_ALLERGY) {
-            if (resultData != null && resultCode == Activity.RESULT_OK) {
-                Uri data = resultData.getData();
-                if (data != null) {
-                    InputStream inputStream;
-                    try {
-                        inputStream = getContentResolver().openInputStream(data);
-                    } catch (FileNotFoundException ignored) {
-                        return;
-                    }
-                    TaskRunner.INSTANCE.executeAsyncTask(createScanTask(requestCode == REQUEST_CODE_ALLERGY, inputStream));
-                }
+    private void handleUriDay(Uri uri) {
+        handleUri(uri, false);
+    }
+
+    private void handleUriAllergy(Uri uri) {
+        handleUri(uri, true);
+    }
+
+    private void handleUri(Uri data, boolean allergy) {
+        if (data != null) {
+            InputStream inputStream;
+            try {
+                inputStream = getContentResolver().openInputStream(data);
+            } catch (FileNotFoundException ignored) {
+                return;
             }
-        } else if (requestCode == REQUEST_EXPORT) {
-            if (resultData != null && resultCode == Activity.RESULT_OK) {
-                Uri data = resultData.getData();
-                if (data != null) {
-                    try {
-                        OutputStream outputStream = getContentResolver().openOutputStream(data);
-                        TaskRunner.INSTANCE.executeAsyncTask(createExportTask(outputStream));
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
+            TaskRunner.INSTANCE.executeAsyncTask(createImportTask(allergy, inputStream));
+        }
+    }
+
+    private void handleExport(Uri data) {
+        if (data != null) {
+            try {
+                OutputStream outputStream = getContentResolver().openOutputStream(data);
+                TaskRunner.INSTANCE.executeAsyncTask(createExportTask(outputStream));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             }
         }
-        super.onActivityResult(requestCode, resultCode, resultData);
     }
 }
