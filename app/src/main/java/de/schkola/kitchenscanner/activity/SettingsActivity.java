@@ -50,7 +50,7 @@ import java.util.Locale;
 public class SettingsActivity extends AppCompatActivity {
 
     private DatabaseAccess dbAccess;
-    private final ActivityResultLauncher<String> createDocument = registerForActivityResult(new ActivityResultContracts.CreateDocument(), this::handleExport);
+    private final ActivityResultLauncher<String> createDocument = registerForActivityResult(new ActivityResultContracts.CreateDocument("text/csv"), this::handleExport);
     private final ActivityResultLauncher<String[]> getContentDay = registerForActivityResult(new ActivityResultContracts.OpenDocument(), this::handleUriDay);
     private final ActivityResultLauncher<String[]> getContentAllergy = registerForActivityResult(new ActivityResultContracts.OpenDocument(), this::handleUriAllergy);
 
