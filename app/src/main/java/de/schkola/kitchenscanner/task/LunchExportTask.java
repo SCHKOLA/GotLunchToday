@@ -22,7 +22,7 @@ public class LunchExportTask extends ProgressAsyncTask<Void> {
 
     @Override
     public Void doInBackground() {
-        try (CSVPrinter printer = new CSVPrinter(new OutputStreamWriter(outputStream, StandardCharsets.ISO_8859_1), CSVFormat.DEFAULT)) {
+        try (CSVPrinter printer = new CSVPrinter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), CSVFormat.DEFAULT)) {
             printer.printRecord("XBA", "Name", "Gericht");
             List<Customer> c = database.customerDao().getCustomerGotLunch();
             for (Customer customer : c) {
