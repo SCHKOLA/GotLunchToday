@@ -3,11 +3,14 @@ package de.schkola.kitchenscanner.util;
 import android.content.Context;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
+import android.os.Build;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@RequiresApi(Build.VERSION_CODES.M)
 public class TorchManager {
 
     private static final long TORCH_WAIT_TIME = 150;

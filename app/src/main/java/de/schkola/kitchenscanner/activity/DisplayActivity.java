@@ -27,6 +27,7 @@ package de.schkola.kitchenscanner.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -72,7 +73,9 @@ public class DisplayActivity extends AppCompatActivity {
             fab.setVisibility(View.VISIBLE);
             fab.setOnClickListener(view -> startScan());
         }
-        tm = new TorchManager(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            tm = new TorchManager(this);
+        }
         if (Objects.equals(intent.getAction(), Intent.ACTION_RUN)) {
             startScan();
         }
@@ -84,7 +87,9 @@ public class DisplayActivity extends AppCompatActivity {
         if (s != null) {
             s.shutdownNow();
         }
-        tm.shutdown();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            tm.shutdown();
+        }
         super.finish();
     }
 
