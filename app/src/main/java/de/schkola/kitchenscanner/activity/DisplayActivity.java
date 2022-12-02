@@ -166,26 +166,26 @@ public class DisplayActivity extends AppCompatActivity {
     private void handleScanResult(@NonNull ScanIntentResult result) {
         if (result.getContents() == null) {
             finish();
-        } else {
-            TaskRunner.INSTANCE.executeAsync(() -> {
-                List<Allergy> a = new ArrayList<>();
-                String cleanedString = result.getContents().trim().replaceAll("\\D", "");
-                try {
-                    int xba = Integer.parseInt(cleanedString);
-                    Customer c = database.customerDao().getCustomer(xba);
-                    if (c != null) {
-                        a.addAll(database.allergyDao().getAllergies(c.xba));
-                    }
-                    return new LunchResult(c, a);
-                } catch (NumberFormatException e) {
-                    return new LunchResult(null, a);
-                }
-            }, lunchResult -> {
-                fillInformation(lunchResult);
-                if (isRescanEnabled()) {
-                    s.schedule(this::startScan, getRescanTime(), TimeUnit.SECONDS);
-                }
-            });
+            return;
         }
+        TaskRunner.INSTANCE.executeAsync(() -> {
+            List<Allergy> a = new ArrayList<>();
+            String cleanedString = result.getContents().trim().replaceAll("\\D", "");
+            try {
+                int xba = Integer.parseInt(cleanedString);
+                Customer c = database.customerDao().getCustomer(xba);
+                if (c != null) {
+                    a.addAll(database.allergyDao().getAllergies(c.xba));
+                }
+                return new LunchResult(c, a);
+            } catch (NumberFormatException e) {
+                return new LunchResult(null, a);
+            }
+        }, lunchResult -> {
+            fillInformation(lunchResult);
+            if (isRescanEnabled()) {
+                s.schedule(this::startScan, getRescanTime(), TimeUnit.SECONDS);
+            }
+        });
     }
 }
