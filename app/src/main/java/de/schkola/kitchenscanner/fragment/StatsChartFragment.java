@@ -10,30 +10,35 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.database.DatabaseAccess;
+import de.schkola.kitchenscanner.database.LunchDatabase;
 import de.schkola.kitchenscanner.task.StatTask;
 import de.schkola.kitchenscanner.task.TaskRunner;
 
 public class StatsChartFragment extends Fragment {
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
+    private final OptionsMenuProvider optionsMenuProvider = new OptionsMenuProvider();
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        FragmentActivity activity = getActivity();
+        if (activity != null) {
+            activity.addMenuProvider(optionsMenuProvider);
+        }
         return inflater.inflate(R.layout.content_stats_overview, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        StatTask statTask = new StatTask((new DatabaseAccess(getContext())).getDatabase(), result -> {
+        LunchDatabase database = new DatabaseAccess(getContext()).getDatabase();
+        TaskRunner.INSTANCE.executeAsyncTask(new StatTask(database, result -> {
+            database.close();
             ((TextView) view.findViewById(R.id.orderedA)).setText(String.valueOf(result.getLunchA()));
             ((TextView) view.findViewById(R.id.gotA)).setText(String.valueOf(result.getDispensedA()));
             ((TextView) view.findViewById(R.id.getA)).setText(String.valueOf(result.getToDispenseA().size()));
@@ -44,24 +49,34 @@ public class StatsChartFragment extends Fragment {
             ((TextView) view.findViewById(R.id.gotS)).setText(String.valueOf(result.getDispensedS()));
             ((TextView) view.findViewById(R.id.getS)).setText(String.valueOf(result.getToDispenseS().size()));
             view.findViewById(R.id.statsOverviewLoadingScreen).setVisibility(View.GONE);
-        });
-        TaskRunner.INSTANCE.executeAsyncTask(statTask);
+        }));
     }
 
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_stats_chart, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_list) {
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.container, new StatsListFragment())
-                    .commit();
-            return true;
+    public void onDestroyView() {
+        super.onDestroyView();
+        FragmentActivity activity = getActivity();
+        if (activity != null) {
+            activity.removeMenuProvider(optionsMenuProvider);
         }
-        return super.onOptionsItemSelected(item);
+    }
+
+    public class OptionsMenuProvider implements MenuProvider {
+
+        @Override
+        public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+            menuInflater.inflate(R.menu.menu_stats_chart, menu);
+        }
+
+        @Override
+        public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+            if (menuItem.getItemId() == R.id.action_list) {
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.container, new StatsListFragment())
+                        .commit();
+                return true;
+            }
+            return false;
+        }
     }
 }
