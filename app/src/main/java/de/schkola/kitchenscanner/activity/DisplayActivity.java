@@ -24,6 +24,7 @@
 
 package de.schkola.kitchenscanner.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -58,7 +59,6 @@ public class DisplayActivity extends AppCompatActivity {
     private final ActivityResultLauncher<ScanOptions> qrScanner = registerForActivityResult(new ScanContract(), this::handleScanResult);
     private ScheduledExecutorService s;
     private TorchManager tm;
-    private LunchDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +76,6 @@ public class DisplayActivity extends AppCompatActivity {
         if (Objects.equals(intent.getAction(), Intent.ACTION_RUN)) {
             startScan();
         }
-        database = new DatabaseAccess(getApplicationContext()).getDatabase();
     }
 
     @Override
@@ -126,7 +125,6 @@ public class DisplayActivity extends AppCompatActivity {
                 gotToday.setText("");
             }
             allergies.setText(StringUtil.getAllergies(a));
-            TaskRunner.INSTANCE.executeAsync(() -> database.customerDao().updateCustomer(c));
         } else {
             lunch.setText("X");
         }
@@ -143,10 +141,7 @@ public class DisplayActivity extends AppCompatActivity {
     private int getRescanTime() {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         if (pref != null) {
-            String rescan = pref.getString("rescan_time", "2");
-            if (rescan != null) {
-                return Integer.parseInt(rescan);
-            }
+            return Integer.parseInt(pref.getString("rescan_time", "2"));
         }
         return 2;
     }
@@ -168,7 +163,9 @@ public class DisplayActivity extends AppCompatActivity {
             finish();
             return;
         }
+        Context applicationContext = getApplicationContext();
         TaskRunner.INSTANCE.executeAsync(() -> {
+            LunchDatabase database = new DatabaseAccess(applicationContext).getDatabase();
             List<Allergy> a = new ArrayList<>();
             String cleanedString = result.getContents().trim().replaceAll("\\D", "");
             try {
@@ -177,6 +174,8 @@ public class DisplayActivity extends AppCompatActivity {
                 if (c != null) {
                     a.addAll(database.allergyDao().getAllergies(c.xba));
                 }
+                database.customerDao().updateCustomer(c);
+                database.close();
                 return new LunchResult(c, a);
             } catch (NumberFormatException e) {
                 return new LunchResult(null, a);
