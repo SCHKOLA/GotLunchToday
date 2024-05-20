@@ -36,11 +36,15 @@ public class CsvImportTask extends ProgressAsyncTask<Void> {
     @Override
     public Void doInBackground() {
         try {
-            CSVFormat format = CSVFormat.DEFAULT.withAllowMissingColumnNames();
+            CSVFormat format = CSVFormat.Builder.create(CSVFormat.DEFAULT)
+                    .setAllowMissingColumnNames(true)
+                    .build();
             if (!allergy) {
-                format = format.withQuoteMode(QuoteMode.MINIMAL)
-                        .withSkipHeaderRecord()
-                        .withHeader();
+                format = CSVFormat.Builder.create(format)
+                        .setQuoteMode(QuoteMode.MINIMAL)
+                        .setSkipHeaderRecord(true)
+                        .setHeader()
+                        .build();
             }
 
             CSVParser csvParser = CSVParser.parse(inputStream, StandardCharsets.UTF_8, format);
