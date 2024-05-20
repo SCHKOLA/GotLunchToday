@@ -114,7 +114,6 @@ public class DisplayActivity extends AppCompatActivity {
         TextView gotToday = findViewById(R.id.gotToday);
         TextView allergies = findViewById(R.id.allergies);
         if (c != null) {
-            c.gotLunch += 1;
             name.setText(c.name);
             if (c.grade.matches("\\d+")) {
                 clazz.setText(getString(R.string.x_class, c.grade));
@@ -188,6 +187,7 @@ public class DisplayActivity extends AppCompatActivity {
                 int xba = Integer.parseInt(cleanedString);
                 Customer c = database.customerDao().getCustomer(xba);
                 if (c != null) {
+                    c.gotLunch += 1;
                     a.addAll(database.allergyDao().getAllergies(c.xba));
                 }
                 database.customerDao().updateCustomer(c);
