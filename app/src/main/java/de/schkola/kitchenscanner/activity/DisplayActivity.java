@@ -35,9 +35,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.journeyapps.barcodescanner.ScanContract;
-import com.journeyapps.barcodescanner.ScanIntentResult;
-import com.journeyapps.barcodescanner.ScanOptions;
 import de.schkola.kitchenscanner.R;
 import de.schkola.kitchenscanner.database.Allergy;
 import de.schkola.kitchenscanner.database.Customer;
@@ -47,16 +44,22 @@ import de.schkola.kitchenscanner.task.TaskRunner;
 import de.schkola.kitchenscanner.util.LunchResult;
 import de.schkola.kitchenscanner.util.StringUtil;
 import de.schkola.kitchenscanner.util.TorchManager;
+import io.github.g00fy2.quickie.QRResult;
+import io.github.g00fy2.quickie.ScanCustomCode;
+import io.github.g00fy2.quickie.config.BarcodeFormat;
+import io.github.g00fy2.quickie.config.ScannerConfig;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import org.jetbrains.annotations.NotNull;
 
 public class DisplayActivity extends AppCompatActivity {
 
-    private final ActivityResultLauncher<ScanOptions> qrScanner = registerForActivityResult(new ScanContract(), this::handleScanResult);
+    private final ActivityResultLauncher<ScannerConfig> qrScanner = registerForActivityResult(new ScanCustomCode(), this::handleScanResult);
     private ScheduledExecutorService s;
     private TorchManager tm;
 
@@ -150,24 +153,37 @@ public class DisplayActivity extends AppCompatActivity {
      * Starts barcode scan
      */
     private void startScan() {
-        ScanOptions options = new ScanOptions();
-        options.setDesiredBarcodeFormats(ScanOptions.QR_CODE);
-        options.setBeepEnabled(true);
-        options.setOrientationLocked(true);
-        options.addExtra("RESULT_DISPLAY_DURATION_MS", 10L);
-        qrScanner.launch(options);
+        ScannerConfig scannerConfig = new ScannerConfig.Builder()
+                .setBarcodeFormats(Collections.singletonList(BarcodeFormat.FORMAT_QR_CODE))
+                .setHapticSuccessFeedback(false)
+                .setShowTorchToggle(false)
+                .setShowCloseButton(true)
+                .setUseFrontCamera(false)
+                .build();
+        qrScanner.launch(scannerConfig);
     }
 
-    private void handleScanResult(@NonNull ScanIntentResult result) {
-        if (result.getContents() == null) {
+    private void handleScanResult(@NonNull QRResult result) {
+        if (result instanceof QRResult.QRError) {
+            startScan();
+        } else if (result instanceof QRResult.QRUserCanceled) {
             finish();
-            return;
+        } else if (result instanceof QRResult.QRSuccess) {
+            String rawValue = ((QRResult.QRSuccess) result).component1().getRawValue();
+            if (rawValue == null) {
+                startScan();
+            } else {
+                processResult(rawValue);
+            }
         }
+    }
+
+    private void processResult(@NotNull String rawValue) {
         Context applicationContext = getApplicationContext();
         TaskRunner.INSTANCE.executeAsync(() -> {
             LunchDatabase database = new DatabaseAccess(applicationContext).getDatabase();
             List<Allergy> a = new ArrayList<>();
-            String cleanedString = result.getContents().trim().replaceAll("\\D", "");
+            String cleanedString = rawValue.trim().replaceAll("\\D", "");
             try {
                 int xba = Integer.parseInt(cleanedString);
                 Customer c = database.customerDao().getCustomer(xba);
