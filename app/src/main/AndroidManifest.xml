@@ -37,10 +37,6 @@
             android:name=".activity.StatsActivity"
             android:label="@string/stats"
             android:parentActivityName=".activity.MainActivity" />
-        <activity
-            android:name="com.journeyapps.barcodescanner.CaptureActivity"
-            android:screenOrientation="landscape"
-            tools:replace="screenOrientation" />
     </application>
 
 </manifest>
