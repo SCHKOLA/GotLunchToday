@@ -158,6 +158,7 @@ public class DisplayActivity extends AppCompatActivity {
                 .setShowTorchToggle(false)
                 .setShowCloseButton(true)
                 .setUseFrontCamera(false)
+                .setKeepScreenOn(true)
                 .build();
         qrScanner.launch(scannerConfig);
     }
