@@ -190,11 +190,12 @@ public class DisplayActivity extends AppCompatActivity {
                 if (c != null) {
                     c.gotLunch += 1;
                     a.addAll(database.allergyDao().getAllergies(c.xba));
+                    database.customerDao().updateCustomer(c);
                 }
-                database.customerDao().updateCustomer(c);
                 database.close();
                 return new LunchResult(c, a);
             } catch (NumberFormatException e) {
+                database.close();
                 return new LunchResult(null, a);
             }
         }, lunchResult -> {
