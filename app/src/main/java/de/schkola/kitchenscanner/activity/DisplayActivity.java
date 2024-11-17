@@ -27,6 +27,9 @@ package de.schkola.kitchenscanner.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -62,6 +65,7 @@ public class DisplayActivity extends AppCompatActivity {
     private final ActivityResultLauncher<ScannerConfig> qrScanner = registerForActivityResult(new ScanCustomCode(), this::handleScanResult);
     private ScheduledExecutorService executorService;
     private TorchManager torchManager;
+    private MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +80,8 @@ public class DisplayActivity extends AppCompatActivity {
             fab.setOnClickListener(view -> startScan());
         }
         torchManager = new TorchManager(this);
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        mediaPlayer = MediaPlayer.create(this, R.raw.success_sound, new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION).build(), audioManager.generateAudioSessionId());
         if (Objects.equals(intent.getAction(), Intent.ACTION_RUN)) {
             startScan();
         }
@@ -88,6 +94,7 @@ public class DisplayActivity extends AppCompatActivity {
             executorService.shutdownNow();
         }
         torchManager.shutdown();
+        mediaPlayer.release();
         super.finish();
     }
 
@@ -201,6 +208,8 @@ public class DisplayActivity extends AppCompatActivity {
         }, lunchResult -> {
             torchManager.enable();
             fillInformation(lunchResult);
+            mediaPlayer.seekTo(0);
+            mediaPlayer.start();
             if (isRescanEnabled()) {
                 executorService.schedule(this::startScan, getRescanTime(), TimeUnit.SECONDS);
             }
