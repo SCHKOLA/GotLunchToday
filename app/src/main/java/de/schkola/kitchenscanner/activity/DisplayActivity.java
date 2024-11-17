@@ -60,8 +60,8 @@ import org.jetbrains.annotations.NotNull;
 public class DisplayActivity extends AppCompatActivity {
 
     private final ActivityResultLauncher<ScannerConfig> qrScanner = registerForActivityResult(new ScanCustomCode(), this::handleScanResult);
-    private ScheduledExecutorService s;
-    private TorchManager tm;
+    private ScheduledExecutorService executorService;
+    private TorchManager torchManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,13 +69,13 @@ public class DisplayActivity extends AppCompatActivity {
         setContentView(R.layout.activity_display);
         Intent intent = getIntent();
         if (isRescanEnabled()) {
-            s = Executors.newSingleThreadScheduledExecutor();
+            executorService = Executors.newSingleThreadScheduledExecutor();
         } else {
             FloatingActionButton fab = findViewById(R.id.fab);
             fab.setVisibility(View.VISIBLE);
             fab.setOnClickListener(view -> startScan());
         }
-        tm = new TorchManager(this);
+        torchManager = new TorchManager(this);
         if (Objects.equals(intent.getAction(), Intent.ACTION_RUN)) {
             startScan();
         }
@@ -84,10 +84,10 @@ public class DisplayActivity extends AppCompatActivity {
     @Override
     public void finish() {
         //Shutdown ExecutorService
-        if (s != null) {
-            s.shutdownNow();
+        if (executorService != null) {
+            executorService.shutdownNow();
         }
-        tm.shutdown();
+        torchManager.shutdown();
         super.finish();
     }
 
@@ -199,9 +199,10 @@ public class DisplayActivity extends AppCompatActivity {
                 return new LunchResult(null, a);
             }
         }, lunchResult -> {
+            torchManager.enable();
             fillInformation(lunchResult);
             if (isRescanEnabled()) {
-                s.schedule(this::startScan, getRescanTime(), TimeUnit.SECONDS);
+                executorService.schedule(this::startScan, getRescanTime(), TimeUnit.SECONDS);
             }
         });
     }
