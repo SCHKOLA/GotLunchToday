@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="de.schkola.kitchenscanner.activity.ui.home.HomeFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/navigation_lunch_list"
+        android:name="de.schkola.kitchenscanner.activity.ui.lunch_list.LunchListFragment"
+        android:label="@string/title_lunch_list"
+        tools:layout="@layout/fragment_lunch_list" />
+
+    <fragment
+        android:id="@+id/navigation_search"
+        android:name="de.schkola.kitchenscanner.activity.ui.search.SearchFragment"
+        android:label="@string/title_search"
+        tools:layout="@layout/fragment_search" />
+
+    <fragment
+        android:id="@+id/navigation_import_export"
+        android:name="de.schkola.kitchenscanner.activity.ui.notifications.ImportExportFragment"
+        android:label="@string/title_import_export"
+        tools:layout="@layout/fragment_import_export" />
+</navigation>

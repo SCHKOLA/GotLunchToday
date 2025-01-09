@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.ui.notifications.ImportExportFragment">
+
+    <RadioGroup
+        android:id="@+id/import_export_type"
+        android:checkedButton="@id/type_lunch_import"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RadioButton
+            android:id="@+id/type_lunch_import"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:text="@string/import_lunch_data" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:labelFor="@id/type_lunch_import"
+            android:paddingLeft="32dp"
+            android:paddingRight="0dp"
+            android:text="@string/import_lunch_data_detail" />
+
+        <RadioButton
+            android:id="@+id/type_allergy_import"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:text="@string/import_allergy_data" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:labelFor="@id/type_allergy_import"
+            android:paddingLeft="32dp"
+            android:paddingRight="0dp"
+            android:text="@string/import_allergy_data_detail" />
+
+        <RadioButton
+            android:id="@+id/type_lunch_export"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:text="@string/export_lunch_data" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:labelFor="@id/type_lunch_export"
+            android:paddingLeft="32dp"
+            android:paddingRight="0dp"
+            android:text="@string/export_lunch_data_detail" />
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/import_export_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="@string/start"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/import_export_type" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,7 +1,9 @@
-package de.schkola.kitchenscanner.task;
+package de.schkola.kitchenscanner.task.import_export;
 
+import android.util.Log;
 import de.schkola.kitchenscanner.database.Customer;
 import de.schkola.kitchenscanner.database.LunchDatabase;
+import de.schkola.kitchenscanner.task.AsyncTask;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -10,14 +12,16 @@ import java.util.List;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
-public class LunchExportTask extends ProgressAsyncTask<Void> {
+public class LunchExportTask implements AsyncTask<Void> {
 
     private final LunchDatabase database;
     private final OutputStream outputStream;
+    private final Runnable resultListener;
 
-    public LunchExportTask(LunchDatabase database, OutputStream outputStream) {
+    public LunchExportTask(LunchDatabase database, OutputStream outputStream, Runnable resultListener) {
         this.database = database;
         this.outputStream = outputStream;
+        this.resultListener = resultListener;
     }
 
     @Override
@@ -29,7 +33,7 @@ public class LunchExportTask extends ProgressAsyncTask<Void> {
                 printer.printRecord(customer.xba, customer.name, customer.lunch);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e("LunchExportTask", "Error in lunch export", e);
         } finally {
             try {
                 outputStream.flush();
@@ -39,5 +43,10 @@ public class LunchExportTask extends ProgressAsyncTask<Void> {
             }
         }
         return null;
+    }
+
+    @Override
+    public void onPostExecute(Void result) {
+        resultListener.run();
     }
 }

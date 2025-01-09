@@ -14,15 +14,15 @@ import java.util.List;
 public class LunchListAdapter extends BaseExpandableListAdapter {
 
     private final Context context;
-    private final List<String> getLunchA;
-    private final List<String> getLunchB;
-    private final List<String> getLunchS;
+    private final List<String> lunchA;
+    private final List<String> lunchB;
+    private final List<String> lunchS;
 
-    public LunchListAdapter(Context context, List<String> getLunchA, List<String> getLunchB, List<String> getLunchS) {
+    public LunchListAdapter(Context context, List<String> lunchA, List<String> lunchB, List<String> lunchS) {
         this.context = context;
-        this.getLunchA = getLunchA;
-        this.getLunchB = getLunchB;
-        this.getLunchS = getLunchS;
+        this.lunchA = lunchA;
+        this.lunchB = lunchB;
+        this.lunchS = lunchS;
     }
 
     @Override
@@ -58,11 +58,17 @@ public class LunchListAdapter extends BaseExpandableListAdapter {
     public List<String> getGroup(int groupPosition) {
         switch (groupPosition) {
             case 0:
-                return getLunchA;
+                if (!lunchA.isEmpty()) {
+                    return lunchA;
+                }
             case 1:
-                return getLunchB;
+                if (!lunchB.isEmpty()) {
+                    return lunchB;
+                }
             case 2:
-                return getLunchS;
+                if (!lunchS.isEmpty()) {
+                    return lunchS;
+                }
             default:
                 return Collections.emptyList();
         }
@@ -70,7 +76,17 @@ public class LunchListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getGroupCount() {
-        return 3;
+        int i = 0;
+        if (!lunchA.isEmpty()) {
+            i++;
+        }
+        if (!lunchB.isEmpty()) {
+            i++;
+        }
+        if (!lunchS.isEmpty()) {
+            i++;
+        }
+        return i;
     }
 
     @Override
@@ -83,14 +99,20 @@ public class LunchListAdapter extends BaseExpandableListAdapter {
         int headerTitle;
         switch (groupPosition) {
             case 0:
-                headerTitle = R.string.getLunchA;
-                break;
+                if (!lunchA.isEmpty()) {
+                    headerTitle = R.string.getLunchA;
+                    break;
+                }
             case 1:
-                headerTitle = R.string.getLunchB;
-                break;
+                if (!lunchB.isEmpty()) {
+                    headerTitle = R.string.getLunchB;
+                    break;
+                }
             case 2:
-                headerTitle = R.string.getLunchS;
-                break;
+                if (!lunchS.isEmpty()) {
+                    headerTitle = R.string.getLunchS;
+                    break;
+                }
             default:
                 headerTitle = 0;
         }

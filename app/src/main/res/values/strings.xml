@@ -19,22 +19,16 @@
         <item>5</item>
     </string-array>
 
-    <string name="csv_import_ongoing">Importing CSV data…</string>
-    <string name="csv_import">CSV data import</string>
+    <string name="import_ongoing">Importing data…</string>
     <string name="error">Error</string>
-    <string name="no_file_found">No CSV file was found!</string>
-    <string name="csv_file_copy">Import CSV data (day)</string>
-    <string name="csv_file_copy_allergy">Import CSV data (allergy)</string>
+    <string name="file_not_found">File was not found!</string>
     <string name="gotLunch">Comes for the %d. time</string>
     <string name="delete_data">Delete data</string>
     <string name="lunch_display">Lunch display</string>
-    <string name="start_text">In order to import the required CSV file, the settings must be opened using the gear wheel. Now use the three points to select \'Import CSV data (day)\' and answer the question with OK. Pressing this button initiates the import. If the import was successful, a corresponding message appears. When the CSV file has been imported, the scanner is ready. Simply press the icon with the camera and the scanner opens, and a meal card can now be scanned. In order to set the interval of the scans, the settings can be opened again via the gearwheel. When the day is over you have to delete the data again via the gear and the three points.</string>
+    <string name="start_text">In order to import the required CSV file, choose the \'Import / Export\' tab. Now use choose the correspondent type and file and then press \'Start\'. Pressing this button initiates the import. If the import was successful, a corresponding message appears. When the CSV file has been imported, the scanner is ready. Simply press the icon with the camera and the scanner opens, and a meal card can now be scanned. In order to set the interval of the scans, the settings can be opened via the gearwheel.</string>
     <string name="start_title">Use of the scanner</string>
-    <string name="copy_request_day">The old daily file will be replaced!\nWould you like to delete old meal details?</string>
-    <string name="copy_request_allergy">The old allergy data will be replaced!\nAre you sure you want to continue?</string>
     <string name="delete">Delete</string>
     <string name="delete_request">All meal dates will be removed!\nAre you sure you want to continue?</string>
-    <string name="stats">Statistics</string>
     <string name="ordered">Ordered</string>
     <string name="got">Served</string>
     <string name="get">To serve</string>
@@ -50,9 +44,32 @@
     <string name="no">No</string>
     <string name="cancel">Cancel</string>
     <string name="x_class">%s. grade</string>
-    <string name="duplicate_xba">Duplicate XBA found!</string>
+    <string name="duplicate_entries">Duplicate entries found!</string>
     <string name="export_lunch_data">Export Lunch Data</string>
     <string name="lunch_export">Lunch data export</string>
-    <string name="lunch_export_ongoing">Exporting Lunch data…</string>
+    <string name="export_ongoing">Exporting data…</string>
+    <string name="pref_play_sound_on_success">Play sound on successful scan</string>
+    <string name="title_activity_bottom_nav" translatable="false">BottomNavActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_lunch_list">Lunch List</string>
+    <string name="title_import_export">Import / Export</string>
+    <string name="title_search">Search</string>
+    <string name="help">Help</string>
+    <string name="help_display">Help</string>
+    <string name="import_lunch_data">Import lunch data</string>
+    <string name="import_lunch_data_detail">Updates the lunch database with the data with data for the current day. Replaces the current data.</string>
+    <string name="import_allergy_data">Import allergy data</string>
+    <string name="import_allergy_data_detail">Updates the allergy database with the data with new data. Replaces the current data.</string>
+    <string name="export_lunch_data_detail">Exports the current data, who came to lunch into a file.</string>
+    <string name="start">Start</string>
+    <string name="import_export_display">Import / Export</string>
+    <string name="import_export_type_label">"Type: "</string>
+    <string name="file">File</string>
+    <string name="choose">Choose</string>
+    <string name="error_parameter">Error in parameter transition</string>
+    <string name="error_file_not_found">File not found</string>
+    <string name="success">Success</string>
+    <string name="import_successful">Import successful</string>
+    <string name="export_successful">Export successful</string>
 
 </resources>

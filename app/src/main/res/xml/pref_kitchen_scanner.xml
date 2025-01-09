@@ -16,4 +16,8 @@
         app:negativeButtonText="@null"
         app:positiveButtonText="@null"
         app:title="@string/pref_title_rescan_time" />
+    <SwitchPreference
+        app:defaultValue="true"
+        app:key="success_sound"
+        app:title="@string/pref_play_sound_on_success" />
 </PreferenceScreen>

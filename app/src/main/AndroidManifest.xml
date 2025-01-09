@@ -10,6 +10,7 @@
 
     <application
         android:allowBackup="true"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_descriptor"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
@@ -18,7 +19,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".activity.MainActivity"
+            android:name=".activity.MainBottomNavActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,15 +29,19 @@
         <activity
             android:name=".activity.SettingsActivity"
             android:label="@string/settings"
-            android:parentActivityName=".activity.MainActivity" />
+            android:parentActivityName=".activity.MainBottomNavActivity" />
         <activity
             android:name=".activity.DisplayActivity"
             android:label="@string/lunch_display"
-            android:parentActivityName=".activity.MainActivity" />
+            android:parentActivityName=".activity.MainBottomNavActivity" />
         <activity
-            android:name=".activity.StatsActivity"
-            android:label="@string/stats"
-            android:parentActivityName=".activity.MainActivity" />
+            android:name=".activity.HelpActivity"
+            android:label="@string/help_display"
+            android:parentActivityName=".activity.MainBottomNavActivity" />
+        <activity
+            android:name=".activity.ImportExportActivity"
+            android:label="@string/import_export_display"
+            android:parentActivityName=".activity.MainBottomNavActivity" />
     </application>
 
 </manifest>

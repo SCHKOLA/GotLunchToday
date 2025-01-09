@@ -1,0 +1,90 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "e86d491c82440c2f55e948ed0b642905",
+    "entities": [
+      {
+        "tableName": "customers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`xba` INTEGER NOT NULL, `name` TEXT, `grade` TEXT, `lunch` INTEGER NOT NULL, `gotLunch` INTEGER NOT NULL, PRIMARY KEY(`xba`))",
+        "fields": [
+          {
+            "fieldPath": "xba",
+            "columnName": "xba",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "grade",
+            "columnName": "grade",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lunch",
+            "columnName": "lunch",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gotLunch",
+            "columnName": "gotLunch",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "xba"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "allergies",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`allergyId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `allergy` TEXT, `xba` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "allergyId",
+            "columnName": "allergyId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "allergy",
+            "columnName": "allergy",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "xba",
+            "columnName": "xba",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "allergyId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e86d491c82440c2f55e948ed0b642905')"
+    ]
+  }
+}

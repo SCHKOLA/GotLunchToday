@@ -155,6 +155,14 @@ public class DisplayActivity extends AppCompatActivity {
         return 2;
     }
 
+    private boolean shouldPlaySuccessSound() {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        if (pref != null) {
+            return pref.getBoolean("success_sound", true);
+        }
+        return true;
+    }
+
     /**
      * Starts barcode scan
      */
@@ -208,8 +216,10 @@ public class DisplayActivity extends AppCompatActivity {
         }, lunchResult -> {
             torchManager.enable();
             fillInformation(lunchResult);
-            mediaPlayer.seekTo(0);
-            mediaPlayer.start();
+            if (shouldPlaySuccessSound()) {
+                mediaPlayer.seekTo(0);
+                mediaPlayer.start();
+            }
             if (isRescanEnabled()) {
                 executorService.schedule(this::startScan, getRescanTime(), TimeUnit.SECONDS);
             }
