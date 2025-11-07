@@ -9,8 +9,8 @@ android {
         applicationId "de.schkola.kitchenscanner"
         minSdkVersion 24
         targetSdkVersion 34
-        versionCode 1900
-        versionName "1.9.0"
+        versionCode 1910
+        versionName "1.9.1"
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -22,6 +22,11 @@ android {
     }
     room {
         schemaDirectory "$projectDir/schemas"
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+        }
     }
 }
 
