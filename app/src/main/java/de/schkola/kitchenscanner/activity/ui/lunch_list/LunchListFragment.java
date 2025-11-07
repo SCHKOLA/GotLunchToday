@@ -26,12 +26,20 @@ public class LunchListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        LunchDatabase database = new DatabaseAccess(getContext()).getDatabase();
-        TaskRunner.INSTANCE.executeAsyncTask(new StatTask(database, result -> {
-            database.close();
-            ExpandableListView listView = view.findViewById(R.id.lunch_list_view);
-            listView.setAdapter(new LunchListAdapter(getContext(), result.getToDispenseA(), result.getToDispenseB(), result.getToDispenseS()));
-            view.findViewById(R.id.lunch_list_loading_screen).setVisibility(View.GONE);
-        }));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        View view = getView();
+        if (view != null) {
+            LunchDatabase database = new DatabaseAccess(getContext()).getDatabase();
+            TaskRunner.INSTANCE.executeAsyncTask(new StatTask(database, result -> {
+                database.close();
+                ExpandableListView listView = view.findViewById(R.id.lunch_list_view);
+                listView.setAdapter(new LunchListAdapter(getContext(), result.getToDispenseA(), result.getToDispenseB(), result.getToDispenseS()));
+                view.findViewById(R.id.lunch_list_loading_screen).setVisibility(View.GONE);
+            }));
+        }
     }
 }
